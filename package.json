@@ -1,6 +1,6 @@
 {
     "name": "@gts-ui/chart-gantt",
-    "version": "1.0.11",
+    "version": "0.0.1",
     "description": "A lightweight, modern, and interactive Gantt chart library for building project timelines on the web.",
     "main": "dist/gantt.umd.js",
     "module": "dist/gantt.es.js",
@@ -18,7 +18,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://gitlab.pge-energo.ru/ui/chart-gantt.git"
+        "url": "git+https://gitlab.pge-energo.ru/gts-ui/libs/chart-gantt.git"
     },
     "files": [
         "dist",
@@ -43,12 +43,12 @@
         "interactive gantt",
         "project management"
     ],
-    "author": "Akhil Reddy N V",
+    "author": "GTS",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/Akhi1Codes/gantt/issues"
+        "url": "https://gitlab.pge-energo.ru/gts-ui/libs/chart-gantt/issues"
     },
-    "homepage": "https://github.com/Akhi1Codes/gantt",
+    "homepage": "https://gitlab.pge-energo.ru/gts-ui/libs/chart-gantt",
     "devDependencies": {
         "@types/node": "^24.1.0",
         "eslint": "^9.32.0",
