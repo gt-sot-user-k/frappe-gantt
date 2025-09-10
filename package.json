@@ -1,5 +1,5 @@
 {
-    "name": "ganttflow",
+    "name": "chart-gantt",
     "version": "1.0.11",
     "description": "A lightweight, modern, and interactive Gantt chart library for building project timelines on the web.",
     "main": "dist/gantt.umd.js",
@@ -18,7 +18,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/Akhi1Codes/gantt.git"
+        "url": "git+https://gitlab.pge-energo.ru/ui/chart-gantt.git"
     },
     "files": [
         "dist",
