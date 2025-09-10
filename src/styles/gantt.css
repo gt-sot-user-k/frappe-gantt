@@ -6,8 +6,6 @@
 	height: 100%;
 	display: flex;
 	overflow: hidden;
-	border-radius: 8px;
-	border: 1px solid var(--g-row-border-color);
 
 	& .gantt-label-field {
 		position: static;
@@ -239,8 +237,8 @@
 
 		& .popup-wrapper {
 			position: absolute;
-			top: 0;
-			left: 0;
+			top: -20px;
+			left: -20px;
 			background: var(--g-bar-color);
 			box-shadow: 0px 10px 24px -3px rgba(0, 0, 0, 0.2);
 			padding: 10px;
@@ -459,8 +457,6 @@
 	height: 100%;
 	display: flex;
 	overflow: hidden;
-	border-radius: 8px;
-	border: 1px solid var(--g-row-border-color);
 
 	& .gantt-header {
 		height: calc(var(--gv-lower-header-height) + var(--gv-upper-header-height) + 10px);
@@ -468,7 +464,6 @@
 		position: sticky;
 		top: 0;
 		left: 0;
-		border-bottom: 1px solid var(--g-row-border-color);
 		z-index: 0;
 
 		& .lower-text,

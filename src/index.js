@@ -401,10 +401,10 @@ export default class Gantt {
 			'--gv-column-width',
 			this.config.column_width + 'px',
 		);
-		this.config.header_height =
-			this.options.lower_header_height +
+		this.config.header_height = (this.$header_container === this.$container) ?
+			( this.options.lower_header_height +
 			this.options.upper_header_height +
-			10;
+			10) : 0
 
 		let processedMode = { ...mode };
 
