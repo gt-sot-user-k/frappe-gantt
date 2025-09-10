@@ -78,6 +78,7 @@ import './styles/gantt.css';
  * @property {Function} [on_progress_change] - Progress change event handler
  * @property {Function} [on_view_change] - View mode change event handler
  * @property {Object} [labels] - Label configuration
+ * @property {string} [header_mount] - Default view mode name
  */
 
 /**
@@ -619,6 +620,17 @@ export default class Gantt {
     }
 
     make_grid_header() {
+		// Обработать нормально получение элемента.
+		if (!!this.options.header_mount) {
+			const headerMountCandidate = document.querySelector(this.options.header_mount)
+			if (!headerMountCandidate) {
+				console.warn("options.header_mount defined, but wasn't found")
+			} else {
+				this.$header_container = headerMountCandidate
+			}
+		}
+		//---
+
         this.$header = this.create_el({
             width: this.dates.length * this.config.column_width,
             classes: 'grid-header',
@@ -633,6 +645,8 @@ export default class Gantt {
             classes: 'lower-header',
             append_to: this.$header,
         });
+
+		this.$header_container.appendChild(this.$header)
     }
 
     make_side_header() {

@@ -1429,6 +1429,10 @@ class tt {
       });
   }
   make_grid_header() {
+    if (this.options.header_mount) {
+      const t = document.querySelector(this.options.header_mount);
+      t ? this.$header_container = t : console.warn("options.header_mount defined, but wasn't found");
+    }
     this.$header = this.create_el({
       width: this.dates.length * this.config.column_width,
       classes: "grid-header",
@@ -1439,7 +1443,7 @@ class tt {
     }), this.$lower_header = this.create_el({
       classes: "lower-header",
       append_to: this.$header
-    });
+    }), this.$header_container.appendChild(this.$header);
   }
   make_side_header() {
     if (this.$side_header = this.create_el({ classes: "side-header" }), this.$upper_header.prepend(this.$side_header), this.options.view_mode_select) {

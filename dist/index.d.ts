@@ -1,3 +1,6 @@
+import { default as Theme } from './theme';
+import { default as Popup } from './popup';
+import { default as Label } from './label';
 /**
  * Main Gantt chart class for creating interactive project timelines
  * @class
@@ -69,6 +72,7 @@ declare class Gantt {
     grid_height: number;
     make_grid_rows(): void;
     make_grid_header(): void;
+    $header_container: any;
     $header: any;
     $upper_header: any;
     $lower_header: any;
@@ -427,6 +431,3 @@ export type GanttOptions = {
      */
     labels?: any;
 };
-import Theme from './theme';
-import Popup from './popup';
-import Label from './label';
