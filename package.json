@@ -1,5 +1,5 @@
 {
-    "name": "chart-gantt",
+    "name": "@gts-ui/chart-gantt",
     "version": "1.0.11",
     "description": "A lightweight, modern, and interactive Gantt chart library for building project timelines on the web.",
     "main": "dist/gantt.umd.js",
