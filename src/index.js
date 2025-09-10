@@ -185,6 +185,7 @@ export default class Gantt {
 		// TODO: Need to process this option correctly.
 		if (!!this.options.header_mount) {
 			const headerMountCandidate = document.querySelector(this.options.header_mount)
+			headerMountCandidate.classList.add('gantt-header-container')
 			if (headerMountCandidate) {
 				this.$header_container = headerMountCandidate
 			} else {
@@ -642,7 +643,7 @@ export default class Gantt {
 	make_grid_header() {
 		this.$header = this.create_el({
 			width: this.dates.length * this.config.column_width,
-			classes: 'grid-header',
+			classes: 'gantt-header',
 			append_to: this.$header_container,
 		});
 
