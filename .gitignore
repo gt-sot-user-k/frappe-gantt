@@ -32,5 +32,5 @@ node_modules
 gh-pages
 feedback*.md
 
-dist/
+dist
 *.tar.gz

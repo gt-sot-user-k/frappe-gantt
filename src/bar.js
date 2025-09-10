@@ -384,7 +384,7 @@ export default class Bar {
                         task: this.task,
                         target: this.$bar,
                     });
-                this.gantt.$container
+                this.gantt.$header_container
                     .querySelector(`.highlight-${task_id}`)
                     .classList.remove('hide');
             }, 200);
@@ -393,7 +393,7 @@ export default class Bar {
             clearTimeout(timeout);
             if (this.gantt.options.popup_on === 'hover')
                 this.gantt.popup?.hide?.();
-            this.gantt.$container
+            this.gantt.$header_container
                 .querySelector(`.highlight-${task_id}`)
                 .classList.add('hide');
         });
