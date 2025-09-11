@@ -7,6 +7,6 @@ stages:
 publish-npm:
   stage: deploy
   script:
-    - echo "@gts-ui:registry=https://${REGISTRY_HOST}" > .npmrc
-    - echo "//${REGISTRY_HOST}/:_authToken=${REGISTRY_HOST_TOKEN}" >> .npmrc
+    - echo "@gts-ui:registry=https://${REGISTRY_HOST}" | tee .npmrc
+    - echo "//${REGISTRY_HOST}/:_authToken=${REGISTRY_HOST_AUTH_TOKEN}" | tee -a .npmrc
     - npm publish
