@@ -7,6 +7,6 @@ stages:
 publish-npm:
   stage: deploy
   script:
-    - echo "@gts-ui:registry=https://${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/" > .npmrc
-    - echo "//${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN}" >> .npmrc
+    - echo "@gts-ui:registry=https://${REGISTRY_HOST}" > .npmrc
+    - echo "//${REGISTRY_HOST}/:_authToken=${REGISTRY_HOST_TOKEN}" >> .npmrc
     - npm publish
