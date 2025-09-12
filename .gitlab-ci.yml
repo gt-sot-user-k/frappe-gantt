@@ -8,6 +8,7 @@ stages:
 build-package:
   stage: build
   script:
+    - npm i
     - npm run build
   only:  
     - master
