@@ -7,7 +7,7 @@ stages:
 
 build-package:
   stage: build
-  tags: [ tram-runner-shell,  ubuntu-20-docker,  tram-runner-docker  ]
+  tags: [ tram-runner-shell ]
   script:
     - npm i
     - npm run build
