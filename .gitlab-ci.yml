@@ -2,10 +2,29 @@ default:
   image: node:latest
 
 stages:
+  - build
   - deploy
+
+build-package:
+  tags: 
+    - ubuntu-20-docker
+    - tram-runner-docker 
+    - tram-runner-shell
+    - ubuntu-20-docker
+  stage: build
+  script:
+    - npm run build
+  only:  
+    - master
+    - release
+    - /^feature\/.*$/
 
 publish-npm:
   stage: deploy
   script:
     - echo "//${REGISTRY_HOST}/:_authToken=\"${REGISTRY_HOST_AUTH_TOKEN}\"" | tee -a .npmrc
     - npm publish
+  only:  
+    - master
+    - release
+    - /^feature\/.*$/
