@@ -6,11 +6,6 @@ stages:
   - deploy
 
 build-package:
-  tags: 
-    - ubuntu-20-docker
-    - tram-runner-docker 
-    - tram-runner-shell
-    - ubuntu-20-docker
   stage: build
   script:
     - npm run build
