@@ -434,4 +434,8 @@ export type GanttOptions = {
      * - Default view mode name
      */
     header_mount?: string;
+    /**
+     * - Is theme changing enabled?
+     */
+    is_dark_theme_enabled?: boolean;
 };

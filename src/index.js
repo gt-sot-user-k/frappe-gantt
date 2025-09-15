@@ -79,6 +79,7 @@ import './styles/gantt.css';
  * @property {Function} [on_view_change] - View mode change event handler
  * @property {Object} [labels] - Label configuration
  * @property {string} [header_mount] - Default view mode name
+ * @property {boolean} [is_dark_theme_enabled] - Is theme changing enabled?
  */
 
 /**
@@ -728,7 +729,7 @@ export default class Gantt {
 			this.$side_header.prepend(this.$expected_line_button);
 		}
 
-		this.theme = new Theme(this);
+		this.theme = this.options.is_dark_theme_enabled? new Theme(this): null;
 	}
 
 	make_side_bar() {
