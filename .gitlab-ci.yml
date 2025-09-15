@@ -7,6 +7,7 @@ stages:
 
 build-package:
   stage: build
+  tags: [ tram-runner-shell ]
   script:
     - npm i
     - npm run build
@@ -17,6 +18,7 @@ build-package:
 
 publish-npm:
   stage: deploy
+  tags: [ tram-runner-shell ]
   script:
     - echo "//${REGISTRY_HOST}/:_authToken=\"${REGISTRY_HOST_AUTH_TOKEN}\"" | tee -a .npmrc
     - npm publish

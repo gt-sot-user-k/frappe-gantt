@@ -1477,7 +1477,7 @@ class tt {
       classes: "expected-line-button",
       type: "button",
       append_to: this.$side_header
-    }), this.$expected_line_button.textContent = "Expected", this.$expected_line_button.onclick = this.toggle_expected_lines.bind(this), this.$side_header.prepend(this.$expected_line_button)), this.theme = new Q(this);
+    }), this.$expected_line_button.textContent = "Expected", this.$expected_line_button.onclick = this.toggle_expected_lines.bind(this), this.$side_header.prepend(this.$expected_line_button)), this.theme = this.options.is_dark_theme_enabled ? new Q(this) : null;
   }
   make_side_bar() {
     this.$sidebar = this.create_el({
