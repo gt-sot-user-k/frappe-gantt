@@ -1,6 +1,3 @@
-import { default as Theme } from './theme';
-import { default as Popup } from './popup';
-import { default as Label } from './label';
 /**
  * Main Gantt chart class for creating interactive project timelines
  * @class
@@ -18,10 +15,11 @@ declare class Gantt {
     $container: any;
     $svg: any;
     $popup_wrapper: any;
+    setup_header_wrapper(opts: any): void;
+    $header_container: any;
     setup_options(options: any): void;
     original_options: any;
     options: any;
-    $header_container: any;
     config: {
         ignored_dates: any[];
         ignored_positions: any[];
@@ -63,6 +61,7 @@ declare class Gantt {
     bind_events(): void;
     render(): void;
     _preserveLabelState: boolean;
+    re_render_header(): void;
     setup_layers(): void;
     layers: {};
     $extras: any;
@@ -439,3 +438,6 @@ export type GanttOptions = {
      */
     is_dark_theme_enabled?: boolean;
 };
+import Theme from './theme';
+import Popup from './popup';
+import Label from './label';
