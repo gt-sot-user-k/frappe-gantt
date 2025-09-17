@@ -58,6 +58,7 @@ import './styles/gantt.css';
  * @property {string} [lines] - Grid lines: 'both', 'vertical', 'horizontal', 'none'
  * @property {boolean} [move_dependencies] - Move dependent tasks when dragging
  * @property {number} [padding] - Padding between task bars
+ * @property {number} [progress_bar_padding] - Padding for progress bar
  * @property {Function|boolean} [popup] - Popup configuration function or false to disable
  * @property {string} [popup_on] - When to show popup: 'click' or 'hover'
  * @property {boolean} [readonly_progress] - Disable progress editing
