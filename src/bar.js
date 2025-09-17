@@ -171,7 +171,7 @@ export default class Bar {
             r = this.corner_radius + 2;
         this.$bar_progress = createSVG('rect', {
             x: this.x,
-            y: this.y,
+            y: this.y + this.gantt.options.progress_bar_padding,
             width: this.progress_width,
             height: this.height,
             rx: r,

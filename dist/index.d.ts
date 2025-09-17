@@ -1,3 +1,6 @@
+import { default as Theme } from './theme';
+import { default as Popup } from './popup';
+import { default as Label } from './label';
 /**
  * Main Gantt chart class for creating interactive project timelines
  * @class
@@ -350,6 +353,10 @@ export type GanttOptions = {
      */
     padding?: number;
     /**
+     * - Padding for progress bar
+     */
+    progress_bar_padding?: number;
+    /**
      * - Popup configuration function or false to disable
      */
     popup?: Function | boolean;
@@ -438,6 +445,3 @@ export type GanttOptions = {
      */
     is_dark_theme_enabled?: boolean;
 };
-import Theme from './theme';
-import Popup from './popup';
-import Label from './label';

@@ -418,7 +418,7 @@ class G {
     let t = this.corner_radius;
     /^((?!chrome|android).)*safari/i.test(navigator.userAgent) || (t = this.corner_radius + 2), this.$bar_progress = f("rect", {
       x: this.x,
-      y: this.y,
+      y: this.y + this.gantt.options.progress_bar_padding,
       width: this.progress_width,
       height: this.height,
       rx: t,
