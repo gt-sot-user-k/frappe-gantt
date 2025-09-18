@@ -1408,7 +1408,7 @@ class tt {
     this.make_grid_highlights(), this.make_grid_ticks();
   }
   make_grid_background() {
-    const t = this.dates.length * this.config.column_width, e = this.options.header_mount ? this.config.header_height + this.options.padding + (this.options.bar_height + this.options.padding) * this.tasks.length - 10 : 0;
+    const t = this.dates.length * this.config.column_width, e = this.options.header_mount ? 0 : this.config.header_height + this.options.padding + (this.options.bar_height + this.options.padding) * this.tasks.length - 10;
     let i = 0;
     if (this.options.container_height === "auto") {
       const n = this.$container.getBoundingClientRect();
