@@ -595,13 +595,12 @@ export default class Gantt {
         const grid_width = this.dates.length * this.config.column_width;
 
         // Calculate the minimum height needed for tasks
-        const task_based_height = this.options.header_mount
-            ? 0
-            : this.config.header_height +
-              this.options.padding +
-              (this.options.bar_height + this.options.padding) *
-                  this.tasks.length -
-              10;
+        const task_based_height =
+            (this.options.header_mount ? 0 : this.config.header_height) +
+            // this.options.padding +
+            (this.options.bar_height + this.options.padding) *
+                this.tasks.length -
+            10;
 
         let container_height_fallback = 0;
         if (this.options.container_height === 'auto') {
