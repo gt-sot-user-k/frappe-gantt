@@ -2,27 +2,16 @@ default:
   image: node:latest
 
 stages:
-  - build
-  - deploy
+  - publish
 
-build-package:
-  stage: build
-  tags: [ tram-runner-shell ]
+build-and-publish:
+  stage: publish
+  tags: [ docker ]
   script:
     - npm i
     - npm run build
-  only:  
-    - master
-    - release
-    - /^feature\/.*$/
-
-publish-npm:
-  stage: deploy
-  tags: [ tram-runner-shell ]
-  script:
     - echo "//${REGISTRY_HOST}/:_authToken=\"${REGISTRY_HOST_AUTH_TOKEN}\"" | tee -a .npmrc
-    - npm publish
+    - npm publish --force
   only:  
     - master
     - release
-    - /^feature\/.*$/
