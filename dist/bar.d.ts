@@ -8,7 +8,7 @@ export default class Bar {
      * @param {import('./index.js').default} gantt - The parent Gantt chart instance
      * @param {import('./index.js').Task} task - The task data object
      */
-    constructor(gantt: import('./index.js').default, task: import('./index.js').Task);
+    constructor(gantt: import("./index.js").default, task: import("./index.js").Task);
     /**
      * Refresh the bar display with current task data
      */

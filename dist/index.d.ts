@@ -1,6 +1,3 @@
-import { default as Theme } from './theme';
-import { default as Popup } from './popup';
-import { default as Label } from './label';
 /**
  * Main Gantt chart class for creating interactive project timelines
  * @class
@@ -176,6 +173,23 @@ declare class Gantt {
     toggle_expected_lines(): void;
     init_label(labels: any): void;
     label: Label;
+    /**
+     * Update the height of a specific row
+     * @param {string|number} taskIdOrIndex - Task ID or task index
+     * @param {number} height - New height for the row (in pixels)
+     */
+    updateRowHeight(taskIdOrIndex: string | number, height: number): void;
+    /**
+     * Get the height of a specific row
+     * @param {number} taskIndex - Task index
+     * @returns {number} Row height in pixels
+     */
+    getRowHeight(taskIndex: number): number;
+    /**
+     * Reset row height to default for a specific task
+     * @param {string|number} taskIdOrIndex - Task ID or task index
+     */
+    resetRowHeight(taskIdOrIndex: string | number): void;
 }
 declare namespace Gantt {
     namespace VIEW_MODE {
@@ -445,3 +459,6 @@ export type GanttOptions = {
      */
     is_dark_theme_enabled?: boolean;
 };
+import Theme from './theme';
+import Popup from './popup';
+import Label from './label';
