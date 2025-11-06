@@ -594,13 +594,14 @@ export default class Gantt {
     make_grid_background() {
         const grid_width = this.dates.length * this.config.column_width;
 
-        // Calculate the minimum height needed for tasks
-        const task_based_height =
-            (this.options.header_mount ? 0 : this.config.header_height) +
-            // this.options.padding +
-            (this.options.bar_height + this.options.padding) *
-                this.tasks.length -
-            10;
+        // Calculate the minimum height needed for tasks using custom row heights
+        let task_based_height = (this.options.header_mount ? 0 : this.config.header_height);
+
+        // Sum up all row heights
+        for (let i = 0; i < this.tasks.length; i++) {
+            task_based_height += this.getRowHeight(i);
+        }
+        task_based_height -= 10;
 
         let container_height_fallback = 0;
         if (this.options.container_height === 'auto') {
@@ -639,14 +640,10 @@ export default class Gantt {
         const rows_layer = createSVG('g', { append_to: this.layers.grid });
 
         const row_width = this.dates.length * this.config.column_width;
-        const row_height = this.options.bar_height + this.options.padding;
 
         let y = this.config.header_height;
-        for (
-            let y = this.config.header_height;
-            y < this.grid_height;
-            y += row_height
-        ) {
+        this.tasks.forEach((task, index) => {
+            const row_height = this.getRowHeight(index);
             createSVG('rect', {
                 x: 0,
                 y,
@@ -655,7 +652,8 @@ export default class Gantt {
                 class: 'grid-row',
                 append_to: rows_layer,
             });
-        }
+            y += row_height;
+        });
     }
 
     make_grid_header() {
@@ -775,13 +773,10 @@ export default class Gantt {
         let row_y = this.config.header_height;
 
         const row_width = this.dates.length * this.config.column_width;
-        const row_height = this.options.bar_height + this.options.padding;
         if (this.options.lines !== 'vertical') {
-            for (
-                let y = this.config.header_height;
-                y < this.grid_height;
-                y += row_height
-            ) {
+            // Draw horizontal lines using custom row heights
+            this.tasks.forEach((task, index) => {
+                const row_height = this.getRowHeight(index);
                 createSVG('line', {
                     x1: 0,
                     y1: row_y + row_height,
@@ -791,7 +786,7 @@ export default class Gantt {
                     append_to: $lines_layer,
                 });
                 row_y += row_height;
-            }
+            });
         }
         if (this.options.lines === 'horizontal') return;
 
@@ -2018,6 +2013,85 @@ export default class Gantt {
         } else if (labels) {
             this.label.update_labels(labels);
         }
+    }
+
+    /**
+     * Update the height of a specific row
+     * @param {string|number} taskIdOrIndex - Task ID or task index
+     * @param {number} height - New height for the row (in pixels)
+     */
+    updateRowHeight(taskIdOrIndex, height) {
+        // Find the task by ID or index
+        let task;
+
+        if (typeof taskIdOrIndex === 'string') {
+            task = this.get_task(taskIdOrIndex);
+            if (!task) {
+                console.error(`Task with id "${taskIdOrIndex}" not found`);
+                return;
+            }
+        } else if (typeof taskIdOrIndex === 'number') {
+            task = this.tasks[taskIdOrIndex];
+            if (!task) {
+                console.error(`Task at index ${taskIdOrIndex} not found`);
+                return;
+            }
+        } else {
+            console.error('Invalid taskIdOrIndex parameter. Must be string (task ID) or number (task index)');
+            return;
+        }
+
+        // Validate height
+        if (typeof height !== 'number' || height <= 0) {
+            console.error('Height must be a positive number');
+            return;
+        }
+
+        // Store the custom height on the task object
+        task.row_height = height;
+
+        // Re-render to apply changes
+        this._preserveLabelState = true;
+        this.render();
+    }
+
+    /**
+     * Get the height of a specific row
+     * @param {number} taskIndex - Task index
+     * @returns {number} Row height in pixels
+     */
+    getRowHeight(taskIndex) {
+        const task = this.tasks[taskIndex];
+        return task && task.row_height ? task.row_height : (this.options.bar_height + this.options.padding);
+    }
+
+    /**
+     * Reset row height to default for a specific task
+     * @param {string|number} taskIdOrIndex - Task ID or task index
+     */
+    resetRowHeight(taskIdOrIndex) {
+        let taskIndex;
+
+        if (typeof taskIdOrIndex === 'string') {
+            const task = this.get_task(taskIdOrIndex);
+            if (!task) {
+                console.error(`Task with id "${taskIdOrIndex}" not found`);
+                return;
+            }
+            taskIndex = task._index;
+        } else if (typeof taskIdOrIndex === 'number') {
+            taskIndex = taskIdOrIndex;
+        } else {
+            console.error('Invalid taskIdOrIndex parameter');
+            return;
+        }
+
+        // Remove custom height
+        this.row_heights.delete(taskIndex);
+
+        // Re-render to apply changes
+        this._preserveLabelState = true;
+        this.render();
     }
 }
 

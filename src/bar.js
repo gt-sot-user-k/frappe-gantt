@@ -638,10 +638,15 @@ export default class Bar {
     }
 
     compute_y() {
-        this.y =
-            this.gantt.config.header_height +
-            this.gantt.options.padding / 2 +
-            this.task._index * (this.height + this.gantt.options.padding);
+        // Calculate Y position by summing up all previous row heights
+        let y = this.gantt.config.header_height + this.gantt.options.padding / 2;
+
+        // Add heights of all previous rows
+        for (let i = 0; i < this.task._index; i++) {
+            y += this.gantt.getRowHeight(i);
+        }
+
+        this.y = y;
     }
 
     compute_duration() {

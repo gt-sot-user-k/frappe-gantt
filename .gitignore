@@ -34,3 +34,8 @@ feedback*.md
 
 # dist
 *.tar.gz
+
+dist/
+
+.git/
+.github/

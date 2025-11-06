@@ -179,6 +179,79 @@ The Gantt chart includes a built-in theme toggle that allows users to switch bet
 
 The theme system automatically applies appropriate colors for all chart elements including bars, grid lines, text, backgrounds, and interactive elements.
 
+### Custom Row Heights
+The Gantt chart supports custom row heights for individual tasks, allowing you to create visually distinct rows for different tasks. This is useful when you need to emphasize certain tasks or accommodate varying amounts of content.
+
+**Setting Custom Row Heights:**
+
+You can set a custom height for a specific task row using the `updateRowHeight()` method:
+
+```js
+// Set height by task ID
+gantt.updateRowHeight('task-1', 60);
+
+// Set height by task index
+gantt.updateRowHeight(0, 60);
+```
+
+**Getting Row Heights:**
+
+Retrieve the height of a specific row:
+
+```js
+// Get height by task index
+const height = gantt.getRowHeight(0);
+console.log(height); // Returns custom height or default height
+```
+
+**Resetting Row Heights:**
+
+Reset a row back to the default height:
+
+```js
+// Reset by task ID
+gantt.resetRowHeight('task-1');
+
+// Reset by task index
+gantt.resetRowHeight(0);
+```
+
+**Task Property:**
+
+Custom row heights are stored directly on the task object as the `row_height` property:
+
+```js
+let tasks = [
+  {
+    id: 'task-1',
+    name: 'Important Task',
+    start: '2024-01-01',
+    end: '2024-01-05',
+    row_height: 60  // Custom height for this task
+  },
+  {
+    id: 'task-2',
+    name: 'Normal Task',
+    start: '2024-01-03',
+    end: '2024-01-08'
+    // Uses default height (bar_height + padding)
+  }
+];
+```
+
+**Features:**
+- **Automatic Re-rendering**: The chart automatically re-renders when row heights are updated
+- **Preserved State**: Label panel state is maintained during height updates
+- **Arrow Positioning**: Dependency arrows automatically adjust to custom row heights
+- **Grid Alignment**: Grid rows and lines properly align with custom heights
+- **Serialization**: Custom heights are part of the task object and can be serialized/deserialized
+
+**Example Use Cases:**
+- Emphasize critical path tasks with larger rows
+- Accommodate task labels with varying text lengths
+- Create visual hierarchy in complex project timelines
+- Display additional task metadata within larger rows
+
 ## Development Setup
 If you want to contribute enhancements or fixes:
 
