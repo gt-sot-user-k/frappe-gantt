@@ -14,4 +14,3 @@ build-and-publish:
     - npm publish --force
   only:  
     - master
-    - release
