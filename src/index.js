@@ -5,7 +5,6 @@ import Arrow from './arrow';
 import Bar from './bar';
 import Popup from './popup';
 import Label from './label';
-import Theme from './theme';
 
 import { DEFAULT_OPTIONS, DEFAULT_VIEW_MODES } from './defaults';
 
@@ -80,7 +79,6 @@ import './styles/gantt.css';
  * @property {Function} [on_view_change] - View mode change event handler
  * @property {Object} [labels] - Label configuration
  * @property {string} [header_mount] - Header element mount point selector
- * @property {boolean} [is_dark_theme_enabled] - Is theme changing enabled?
  * @property {string} [scroll_element_selector] - Set element for scrolling observe
  */
 
@@ -401,7 +399,6 @@ export default class Gantt {
         this.render();
         if (maintain_pos) {
             this.$scroll_element.scrollLeft = old_pos;
-            console.log(this.$scroll_element);
             this.options.scroll_to = old_scroll_op;
         }
         this.trigger_event('view_change', [mode]);
@@ -754,10 +751,6 @@ export default class Gantt {
                 this.toggle_expected_lines.bind(this);
             this.$side_header.prepend(this.$expected_line_button);
         }
-
-        this.theme = this.options.is_dark_theme_enabled
-            ? new Theme(this)
-            : null;
     }
 
     make_side_bar() {
