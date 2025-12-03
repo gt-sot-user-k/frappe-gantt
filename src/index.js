@@ -79,8 +79,9 @@ import './styles/gantt.css';
  * @property {Function} [on_progress_change] - Progress change event handler
  * @property {Function} [on_view_change] - View mode change event handler
  * @property {Object} [labels] - Label configuration
- * @property {string} [header_mount] - Default view mode name
+ * @property {string} [header_mount] - Header element mount point selector
  * @property {boolean} [is_dark_theme_enabled] - Is theme changing enabled?
+ * @property {string} [scroll_element_selector] - Set element for scrolling observe
  */
 
 /**
@@ -130,6 +131,7 @@ export default class Gantt {
         this.change_view_mode();
         this.bind_events();
     }
+
     setup_wrapper(element) {
         let svg_element, wrapper_element;
 
@@ -180,6 +182,7 @@ export default class Gantt {
             classes: 'popup-wrapper',
             append_to: this.$container,
         });
+
     }
 
     // TODO: Need to process this option correctly.
@@ -201,6 +204,10 @@ export default class Gantt {
     setup_options(options) {
         this.original_options = options;
         this.options = { ...DEFAULT_OPTIONS, ...options };
+
+        this.$scroll_element = this.options.scroll_element_selector
+            ? document.querySelector(this.options.scroll_element_selector)
+            : this.$container;
 
         const CSS_VARIABLES = {
             'grid-height': 'container_height',
@@ -354,10 +361,11 @@ export default class Gantt {
     /**
      * Refresh the chart with new tasks
      * @param {Task[]} tasks - Array of new task objects
+     * @param {boolean} [maintain_pos=false] - Whether to maintain scroll position
      */
     refresh(tasks) {
         this.setup_tasks(tasks);
-        this.change_view_mode();
+        this.change_view_mode(undefined, true);
     }
 
     /**
@@ -383,7 +391,7 @@ export default class Gantt {
         }
         let old_pos, old_scroll_op;
         if (maintain_pos) {
-            old_pos = this.$container.scrollLeft;
+            old_pos = this.$scroll_element.scrollLeft;
             old_scroll_op = this.options.scroll_to;
             this.options.scroll_to = null;
         }
@@ -392,7 +400,8 @@ export default class Gantt {
         this.setup_dates(maintain_pos);
         this.render();
         if (maintain_pos) {
-            this.$container.scrollLeft = old_pos;
+            this.$scroll_element.scrollLeft = old_pos;
+            console.log(this.$scroll_element);
             this.options.scroll_to = old_scroll_op;
         }
         this.trigger_event('view_change', [mode]);
@@ -595,7 +604,9 @@ export default class Gantt {
         const grid_width = this.dates.length * this.config.column_width;
 
         // Calculate the minimum height needed for tasks using custom row heights
-        let task_based_height = (this.options.header_mount ? 0 : this.config.header_height);
+        let task_based_height = this.options.header_mount
+            ? 0
+            : this.config.header_height;
 
         // Sum up all row heights
         for (let i = 0; i < this.tasks.length; i++) {
@@ -2037,7 +2048,9 @@ export default class Gantt {
                 return;
             }
         } else {
-            console.error('Invalid taskIdOrIndex parameter. Must be string (task ID) or number (task index)');
+            console.error(
+                'Invalid taskIdOrIndex parameter. Must be string (task ID) or number (task index)',
+            );
             return;
         }
 
@@ -2062,7 +2075,9 @@ export default class Gantt {
      */
     getRowHeight(taskIndex) {
         const task = this.tasks[taskIndex];
-        return task && task.row_height ? task.row_height : (this.options.bar_height + this.options.padding);
+        return task && task.row_height
+            ? task.row_height
+            : this.options.bar_height + this.options.padding;
     }
 
     /**

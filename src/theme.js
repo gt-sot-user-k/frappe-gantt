@@ -1,7 +1,7 @@
 export default class Theme {
     constructor(gantt) {
         this.gantt = gantt;
-        this.current_theme = localStorage.getItem('gantt-theme') || 'auto';
+        this.current_theme = localStorage.getItem('gantt-theme') || 'light';
         this.init();
     }
 
