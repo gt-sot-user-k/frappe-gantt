@@ -537,7 +537,7 @@ export default class Bar {
         this.gantt.trigger_event('date_change', [
             this.task,
             new_start_date,
-            date_utils.add(new_end_date, -1, 'second'),
+            new_end_date,
         ]);
     }
 
@@ -639,7 +639,8 @@ export default class Bar {
 
     compute_y() {
         // Calculate Y position by summing up all previous row heights
-        let y = this.gantt.config.header_height + this.gantt.options.padding / 2;
+        let y =
+            this.gantt.config.header_height + this.gantt.options.padding / 2;
 
         // Add heights of all previous rows
         for (let i = 0; i < this.task._index; i++) {
