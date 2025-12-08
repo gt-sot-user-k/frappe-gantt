@@ -69,7 +69,7 @@ export default class Bar {
         this.compute_y();
         this.compute_duration();
         this.corner_radius = this.gantt.options.bar_corner_radius;
-        this.width = this.gantt.config.column_width * this.duration;
+        this.width = this.gantt.config.column_width * this.duration; // Draw more on 10% than date
         if (!this.task.progress || this.task.progress < 0)
             this.task.progress = 0;
         if (this.task.progress > 100) this.task.progress = 100;
