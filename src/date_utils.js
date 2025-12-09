@@ -6,6 +6,16 @@ const MINUTE = 'minute';
 const SECOND = 'second';
 const MILLISECOND = 'millisecond';
 
+const TO_DAYS = {
+    millisecond: 1 / 60 / 60 / 24 / 1000,
+    second: 1 / 60 / 60 / 24,
+    minute: 1 / 60 / 24,
+    hour: 1 / 24,
+    day: 1,
+    month: 30,
+    year: 365,
+};
+
 /**
  * Date utility functions for the Gantt chart
  * @namespace
@@ -239,17 +249,9 @@ export default {
     },
 
     add(date, qty, scale) {
-        qty = parseInt(qty, 10);
-        const vals = [
-            date.getFullYear() + (scale === YEAR ? qty : 0),
-            date.getMonth() + (scale === MONTH ? qty : 0),
-            date.getDate() + (scale === DAY ? qty : 0),
-            date.getHours() + (scale === HOUR ? qty : 0),
-            date.getMinutes() + (scale === MINUTE ? qty : 0),
-            date.getSeconds() + (scale === SECOND ? qty : 0),
-            date.getMilliseconds() + (scale === MILLISECOND ? qty : 0),
-        ];
-        return new Date(...vals);
+        const result = new Date(date);
+        result.setDate(date.getDate() + TO_DAYS[scale] * qty);
+        return result;
     },
 
     start_of(date, scale) {
@@ -298,15 +300,6 @@ export default {
     },
 
     convert_scales(period, to_scale) {
-        const TO_DAYS = {
-            millisecond: 1 / 60 / 60 / 24 / 1000,
-            second: 1 / 60 / 60 / 24,
-            minute: 1 / 60 / 24,
-            hour: 1 / 24,
-            day: 1,
-            month: 30,
-            year: 365,
-        };
         const { duration, scale } = this.parse_duration(period);
         let in_days = duration * TO_DAYS[scale];
         return in_days / TO_DAYS[to_scale];

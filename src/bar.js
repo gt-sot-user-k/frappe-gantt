@@ -539,6 +539,12 @@ export default class Bar {
             new_start_date,
             new_end_date,
         ]);
+
+        this.gantt.trigger_event(`${this.gantt.last_action}_end`, [
+            this.task,
+            new_start_date,
+            new_end_date,
+        ]);
     }
 
     progress_changed() {

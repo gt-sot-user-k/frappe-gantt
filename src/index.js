@@ -75,6 +75,9 @@ import './styles/gantt.css';
  * @property {ViewMode[]} [view_modes] - Available view modes
  * @property {Function} [on_click] - Click event handler
  * @property {Function} [on_date_change] - Date change event handler
+ * @property {Function} [on_left_resizing_end] - Start date change event handler
+ * @property {Function} [on_right_resizing_end] - End date change event handler
+ * @property {Function} [on_dragging_end] - Dragging event handler
  * @property {Function} [on_progress_change] - Progress change event handler
  * @property {Function} [on_view_change] - View mode change event handler
  * @property {Object} [labels] - Label configuration
@@ -233,6 +236,8 @@ export default class Gantt {
             ignored_positions: [],
             extend_by_units: 10,
         };
+
+        this.last_action = null;
 
         if (typeof this.options.ignore !== 'function') {
             if (typeof this.options.ignore === 'string')
@@ -1441,12 +1446,15 @@ export default class Gantt {
             const bar_wrapper = $.closest('.bar-wrapper', element);
             if (element.classList.contains('left')) {
                 is_resizing_left = true;
+                this.last_action = 'resizing_left';
                 element.classList.add('visible');
             } else if (element.classList.contains('right')) {
                 is_resizing_right = true;
+                this.last_action = 'resizing_right';
                 element.classList.add('visible');
             } else if (element.classList.contains('bar-wrapper')) {
                 is_dragging = true;
+                this.last_action = 'dragging';
             }
 
             if (this.popup) this.popup.hide();
@@ -1728,6 +1736,7 @@ export default class Gantt {
             is_dragging = false;
             is_resizing_left = false;
             is_resizing_right = false;
+
             this.$container
                 .querySelector('.visible')
                 ?.classList?.remove?.('visible');
@@ -1735,6 +1744,7 @@ export default class Gantt {
 
         $.on(this.$svg, 'mouseup', (e) => {
             this.bar_being_dragged = null;
+            this.last_action = null;
             bars.forEach((bar) => {
                 const $bar = bar.$bar;
                 if (!$bar.finaldx) return;
