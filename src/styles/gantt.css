@@ -395,10 +395,33 @@
             }
         }
 
-        & .handle {
+        & .resize-handle {
             fill: var(--g-handle-color);
             opacity: 0;
             transition: opacity 0.3s ease;
+
+            &.active,
+            &.visible {
+                cursor: ew-resize;
+                opacity: 1;
+            }
+        }
+        & .dependency-handle-group{
+          background-color: red;
+        }
+
+        & .dependency-handle {
+            fill: var(--g-handle-color);
+            opacity: 0.1;
+            transition: opacity 0.3s ease;
+
+            &.left {
+                padding-right: 10px;
+            }
+
+            &.right {
+                padding-left: 10px;
+            }
 
             &.active,
             &.visible {

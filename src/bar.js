@@ -1,5 +1,8 @@
+import DummyArrow from './dummy_arrow';
 import date_utils from './date_utils';
 import { $, createSVG, animateSVG } from './svg_utils';
+
+const handle_margin = 20;
 
 /**
  * Represents a task bar in the Gantt chart
@@ -23,7 +26,8 @@ export default class Bar {
      */
     refresh() {
         this.bar_group.innerHTML = '';
-        this.handle_group.innerHTML = '';
+        this.resize_handle_group.innerHTML = '';
+        this.dependency_handle_group.innerHTML = '';
         if (this.task.custom_class) {
             this.group.classList.add(this.task.custom_class);
         } else {
@@ -53,8 +57,12 @@ export default class Bar {
             class: 'bar-group',
             append_to: this.group,
         });
-        this.handle_group = createSVG('g', {
-            class: 'handle-group',
+        this.resize_handle_group = createSVG('g', {
+            class: 'resize-handle-group',
+            append_to: this.group,
+        });
+        this.dependency_handle_group = createSVG('g', {
+            class: 'dependency-handle-group',
             append_to: this.group,
         });
     }
@@ -117,6 +125,7 @@ export default class Bar {
         }
         this.draw_label();
         this.draw_resize_handles();
+        this.draw_dependency_handles();
 
         if (this.task.thumbnail) {
             this.draw_thumbnail();
@@ -296,9 +305,9 @@ export default class Bar {
 
         const bar = this.$bar;
         const handle_width = 3;
-        this.handles = [];
+        this.resize_handles = [];
         if (!this.gantt.options.readonly_dates) {
-            this.handles.push(
+            this.resize_handles.push(
                 createSVG('rect', {
                     x: bar.getEndX() - handle_width / 2,
                     y: bar.getY() + this.height / 4,
@@ -306,12 +315,12 @@ export default class Bar {
                     height: this.height / 2,
                     rx: 2,
                     ry: 2,
-                    class: 'handle right',
-                    append_to: this.handle_group,
+                    class: 'resize-handle right',
+                    append_to: this.resize_handle_group,
                 }),
             );
 
-            this.handles.push(
+            this.resize_handles.push(
                 createSVG('rect', {
                     x: bar.getX() - handle_width / 2,
                     y: bar.getY() + this.height / 4,
@@ -319,8 +328,8 @@ export default class Bar {
                     height: this.height / 2,
                     rx: 2,
                     ry: 2,
-                    class: 'handle left',
-                    append_to: this.handle_group,
+                    class: 'resize-handle left',
+                    append_to: this.resize_handle_group,
                 }),
             );
         }
@@ -331,12 +340,52 @@ export default class Bar {
                 cy: bar_progress.getY() + bar_progress.getHeight() / 2,
                 r: 4.5,
                 class: 'handle progress',
-                append_to: this.handle_group,
+                append_to: this.resize_handle_group,
             });
-            this.handles.push(this.$handle_progress);
+            this.resize_handles.push(this.$handle_progress);
         }
 
-        for (let handle of this.handles) {
+        for (let handle of this.resize_handles) {
+            $.on(handle, 'mouseenter', () => handle.classList.add('active'));
+            $.on(handle, 'mouseleave', () => handle.classList.remove('active'));
+        }
+    }
+
+    draw_dependency_handles() {
+        if (this.invalid || this.gantt.options.readonly_dependency) return;
+
+        const bar = this.$bar;
+        const handle_width = 20;
+        this.dependency_handles = [];
+        if (!this.gantt.options.readonly_dates) {
+            this.dependency_handles.push(
+                createSVG('rect', {
+                    x: bar.getEndX() + handle_width / 2 + handle_margin,
+                    y: bar.getY() - this.height / 2,
+                    width: handle_width,
+                    height: this.height * 2,
+                    rx: 2,
+                    ry: 2,
+                    class: 'dependency-handle right',
+                    append_to: this.dependency_handle_group,
+                }),
+            );
+
+            this.dependency_handles.push(
+                createSVG('rect', {
+                    x: bar.getX() - handle_width / 2 - handle_margin,
+                    y: bar.getY() - this.height / 2,
+                    width: handle_width,
+                    height: this.height * 2,
+                    rx: 2,
+                    ry: 2,
+                    class: 'dependency-handle left',
+                    append_to: this.dependency_handle_group,
+                }),
+            );
+        }
+
+        for (let handle of this.dependency_handles) {
             $.on(handle, 'mouseenter', () => handle.classList.add('active'));
             $.on(handle, 'mouseleave', () => handle.classList.remove('active'));
         }
@@ -345,6 +394,7 @@ export default class Bar {
     bind() {
         if (this.invalid) return;
         this.setup_click_event();
+        this.setup_dependency_handle_click();
     }
 
     setup_click_event() {
@@ -361,7 +411,10 @@ export default class Bar {
         if (this.gantt.options.popup_on === 'click') {
             $.on(this.group, 'mouseup', (e) => {
                 const posX = e.offsetX || e.layerX;
-                if (this.$handle_progress) {
+                if (
+                    !this.gantt.options.readonly_progress &&
+                    this.$handle_progress
+                ) {
                     const cx = +this.$handle_progress.getAttribute('cx');
                     if (cx > posX - 1 && cx < posX + 1) return;
                     if (this.gantt.bar_being_dragged) return;
@@ -432,6 +485,20 @@ export default class Bar {
 
             this.gantt.trigger_event('double_click', [this.task]);
         });
+    }
+
+    setup_dependency_handle_click() {
+        for (const handle of this.dependency_handles) {
+            let arrow;
+            $.on(handle, 'mousedown', (e) => {
+                this.gantt.trigger_event('dependency_handle_click', [
+                    this,
+                    handle,
+                ]);
+
+                new DummyArrow(this.gantt, this);
+            });
+        }
     }
 
     /**
@@ -764,12 +831,18 @@ export default class Bar {
     update_handle_position() {
         if (this.invalid || this.gantt.options.readonly) return;
         const bar = this.$bar;
-        this.handle_group
-            .querySelector('.handle.left')
+        this.resize_handle_group
+            .querySelector('.resize-handle.left')
             .setAttribute('x', bar.getX());
-        this.handle_group
-            .querySelector('.handle.right')
+        this.resize_handle_group
+            .querySelector('.resize-handle.right')
             .setAttribute('x', bar.getEndX());
+        this.dependency_handle_group
+            .querySelector('.dependency-handle.left')
+            .setAttribute('x', bar.getX() - handle_margin);
+        this.dependency_handle_group
+            .querySelector('.dependency-handle.right')
+            .setAttribute('x', bar.getEndX() + handle_margin);
         const handle = this.group.querySelector('.handle.progress');
         handle && handle.setAttribute('cx', this.$bar_progress.getEndX());
     }

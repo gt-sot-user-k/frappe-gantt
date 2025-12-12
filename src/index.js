@@ -62,6 +62,7 @@ import './styles/gantt.css';
  * @property {string} [popup_on] - When to show popup: 'click' or 'hover'
  * @property {boolean} [readonly_progress] - Disable progress editing
  * @property {boolean} [readonly_dates] - Disable date editing
+ * @property {boolean} [readonly_dependency] - Disable dependency editing
  * @property {boolean} [readonly] - Make entire chart read-only
  * @property {string|Date} [scroll_to] - Initial scroll position
  * @property {boolean} [show_expected_progress] - Show expected progress indicators
@@ -80,6 +81,7 @@ import './styles/gantt.css';
  * @property {Function} [on_dragging_end] - Dragging event handler
  * @property {Function} [on_progress_change] - Progress change event handler
  * @property {Function} [on_view_change] - View mode change event handler
+ * @property {Function} [on_create_dependency] - Create new dependency arrow event handler
  * @property {Object} [labels] - Label configuration
  * @property {string} [header_mount] - Header element mount point selector
  * @property {string} [scroll_element_selector] - Set element for scrolling observe
@@ -1434,7 +1436,7 @@ export default class Gantt {
         };
 
         let pos = 0;
-        $.on(this.$svg, 'mousemove', '.bar-wrapper, .handle', (e) => {
+        $.on(this.$svg, 'mousemove', '.bar-group, .resize-handle', (e) => {
             if (
                 this.bar_being_dragged === false &&
                 Math.abs((e.offsetX || e.layerX) - pos) > 10
@@ -1442,49 +1444,54 @@ export default class Gantt {
                 this.bar_being_dragged = true;
         });
 
-        $.on(this.$svg, 'mousedown', '.bar-wrapper, .handle', (e, element) => {
-            const bar_wrapper = $.closest('.bar-wrapper', element);
-            if (element.classList.contains('left')) {
-                is_resizing_left = true;
-                this.last_action = 'resizing_left';
-                element.classList.add('visible');
-            } else if (element.classList.contains('right')) {
-                is_resizing_right = true;
-                this.last_action = 'resizing_right';
-                element.classList.add('visible');
-            } else if (element.classList.contains('bar-wrapper')) {
-                is_dragging = true;
-                this.last_action = 'dragging';
-            }
+        $.on(
+            this.$svg,
+            'mousedown',
+            '.bar-group, .resize-handle',
+            (e, element) => {
+                const bar_wrapper = $.closest('.bar-wrapper', element);
+                if (element.classList.contains('left')) {
+                    is_resizing_left = true;
+                    this.last_action = 'resizing_left';
+                    element.classList.add('visible');
+                } else if (element.classList.contains('right')) {
+                    is_resizing_right = true;
+                    this.last_action = 'resizing_right';
+                    element.classList.add('visible');
+                } else if (element.classList.contains('bar-group')) {
+                    is_dragging = true;
+                    this.last_action = 'dragging';
+                }
 
-            if (this.popup) this.popup.hide();
+                if (this.popup) this.popup.hide();
 
-            x_on_start = e.offsetX || e.layerX;
-            y_on_start = e.offsetY || e.layerY;
+                x_on_start = e.offsetX || e.layerX;
+                y_on_start = e.offsetY || e.layerY;
 
-            parent_bar_id = bar_wrapper.getAttribute('data-id');
-            let ids;
-            if (this.options.move_dependencies) {
-                ids = [
-                    parent_bar_id,
-                    ...this.get_all_dependent_tasks(parent_bar_id),
-                ];
-            } else {
-                ids = [parent_bar_id];
-            }
-            bars = ids.map((id) => this.get_bar(id));
+                parent_bar_id = bar_wrapper.getAttribute('data-id');
+                let ids;
+                if (this.options.move_dependencies) {
+                    ids = [
+                        parent_bar_id,
+                        ...this.get_all_dependent_tasks(parent_bar_id),
+                    ];
+                } else {
+                    ids = [parent_bar_id];
+                }
+                bars = ids.map((id) => this.get_bar(id));
 
-            this.bar_being_dragged = false;
-            pos = x_on_start;
+                this.bar_being_dragged = false;
+                pos = x_on_start;
 
-            bars.forEach((bar) => {
-                const $bar = bar.$bar;
-                $bar.ox = $bar.getX();
-                $bar.oy = $bar.getY();
-                $bar.owidth = $bar.getWidth();
-                $bar.finaldx = 0;
-            });
-        });
+                bars.forEach((bar) => {
+                    const $bar = bar.$bar;
+                    $bar.ox = $bar.getX();
+                    $bar.oy = $bar.getY();
+                    $bar.owidth = $bar.getWidth();
+                    $bar.finaldx = 0;
+                });
+            },
+        );
 
         if (this.options.infinite_padding) {
             let extended = false;
@@ -1770,7 +1777,7 @@ export default class Gantt {
             x_on_start = e.offsetX || e.layerX;
             y_on_start = e.offsetY || e.layerY;
 
-            const $bar_wrapper = $.closest('.bar-wrapper', handle);
+            const $bar_wrapper = $.closest('.bar-group', handle);
             const id = $bar_wrapper.getAttribute('data-id');
             bar = this.get_bar(id);
 
