@@ -2,22 +2,24 @@ import { createSVG } from './svg_utils';
 import Arrow from './arrow';
 
 export default class DummyArrow {
-    constructor(gantt, from_task) {
+    constructor(gantt, from_task, from_point) {
         this.gantt = gantt;
         this.from_task = from_task;
-        const { x, y } = this.from_task;
-        this.to_point = { x, y };
+        this.from_point = {
+            x: from_point.x ? from_point.x : this.from_task.$bar.getX(),
+            y: from_point.y ? from_point.y : this.from_task.$bar.getY(),
+        };
+        this.to_point = { x: from_point.x, y: from_point.y };
 
         this.calculate_path();
         this.draw();
     }
 
-    setup_move_listener() {
+    setup_listener() {
         const mousemoveHandler = (e) => {
             if (!e || !e.offsetX || !e.offsetY) {
                 return;
             }
-
             this.to_point = {
                 x: e.offsetX,
                 y: e.offsetY,
@@ -30,7 +32,9 @@ export default class DummyArrow {
                 mousemoveHandler,
             );
 
-            this.gantt.layers.arrow.removeChild(this.element);
+            if (this.gantt.layers.arrow?.contains(this.element)) {
+                this.gantt.layers.arrow.removeChild(this.element);
+            }
             const to_task_bar_wrapper = e.target.closest('.bar-wrapper');
             if (!to_task_bar_wrapper) {
                 return;
@@ -51,12 +55,11 @@ export default class DummyArrow {
     }
 
     calculate_path() {
-        let start_x =
-            this.from_task.$bar.getX() + this.from_task.$bar.getWidth() / 2;
+        let start_x = this.from_point.x;
 
         const condition = () =>
             this.to_point.x < start_x + this.gantt.options.padding &&
-            start_x > this.from_task.$bar.getX() + this.gantt.options.padding;
+            start_x > this.from_point.x + this.gantt.options.padding;
 
         while (condition()) {
             start_x -= 10;
@@ -64,12 +67,7 @@ export default class DummyArrow {
         start_x -= 10;
 
         // Calculate start_y using accumulated row heights
-        let start_y =
-            this.gantt.config.header_height + this.gantt.options.bar_height;
-        for (let i = 0; i < this.from_task.task._index; i++) {
-            start_y += this.gantt.getRowHeight(i);
-        }
-        start_y += this.gantt.options.padding / 2;
+        let start_y = this.from_point.y;
 
         const from_is_below_to = start_y > this.to_point.y;
 
@@ -77,10 +75,7 @@ export default class DummyArrow {
         const clockwise = from_is_below_to ? 1 : 0;
         let curve_y = from_is_below_to ? -curve : curve;
 
-        if (
-            this.to_point.x <=
-            this.from_task.$bar.getX() + this.gantt.options.padding
-        ) {
+        if (this.to_point.x <= this.from_point.x) {
             let down_1 = this.gantt.options.padding / 2 - curve;
             if (down_1 < 0) {
                 down_1 = 0;
@@ -126,7 +121,7 @@ export default class DummyArrow {
             'data-from': this.from_task.task.id,
         });
         this.gantt.layers.arrow.appendChild(this.element);
-        this.setup_move_listener();
+        this.setup_listener();
     }
 
     update() {

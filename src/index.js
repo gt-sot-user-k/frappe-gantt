@@ -1436,13 +1436,18 @@ export default class Gantt {
         };
 
         let pos = 0;
-        $.on(this.$svg, 'mousemove', '.bar-group, .resize-handle', (e) => {
-            if (
-                this.bar_being_dragged === false &&
-                Math.abs((e.offsetX || e.layerX) - pos) > 10
-            )
-                this.bar_being_dragged = true;
-        });
+        $.on(
+            this.$svg,
+            'mousemove',
+            '.bar-group, .resize-handle, dependency-handle',
+            (e) => {
+                if (
+                    this.bar_being_dragged === false &&
+                    Math.abs((e.offsetX || e.layerX) - pos) > 10
+                )
+                    this.bar_being_dragged = true;
+            },
+        );
 
         $.on(
             this.$svg,
@@ -1709,8 +1714,7 @@ export default class Gantt {
 
             bars.forEach((bar) => {
                 const $bar = bar.$bar;
-                // Always on 1px more than snap position.
-                $bar.finaldx = this.get_snap_position(dx, $bar.ox) + 1;
+                $bar.finaldx = this.get_snap_position(dx, $bar.ox);
                 this.hide_popup();
                 if (is_resizing_left) {
                     if (parent_bar_id === bar.task.id) {

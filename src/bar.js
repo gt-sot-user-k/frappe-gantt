@@ -2,7 +2,7 @@ import DummyArrow from './dummy_arrow';
 import date_utils from './date_utils';
 import { $, createSVG, animateSVG } from './svg_utils';
 
-const handle_margin = 20;
+const DEP_HANDLE_SIZE = 10.5;
 
 /**
  * Represents a task bar in the Gantt chart
@@ -44,6 +44,7 @@ export default class Bar {
         this.gantt = gantt;
         this.task = task;
         this.name = this.name || '';
+        this.dep_handle_margin = 12;
     }
 
     prepare_wrappers() {
@@ -363,55 +364,28 @@ export default class Bar {
 
         const bar = this.$bar;
 
-        const handle_width = 24;
+        const cy = bar.getY() + bar.getHeight() / 2;
+        const r = DEP_HANDLE_SIZE / 2;
 
-        const leftHandleCenterX = bar.getX() - handle_width / 2 - handle_margin;
-        const leftHandleCenterY = bar.getY() + this.height / 2;
-        const leftHandle = createSVG('g', {
-            class: 'dependency-handle .left',
-            append_to: this.dependency_handle_group,
-            x: leftHandleCenterX,
-            y: leftHandleCenterY,
-        });
-        createSVG('circle', {
-            cx: leftHandleCenterX,
-            cy: leftHandleCenterY,
-            r: this.height,
-            class: 'background',
-            append_to: leftHandle,
-        });
-        createSVG('path', {
-            width: 24,
-            height: 24,
-            d: `M${leftHandleCenterX - 6} ${leftHandleCenterY} l6 8 m-6 -8 l6 -8`,
-            class: 'arrow',
-            append_to: leftHandle,
-        });
+        this.dependency_handles.push(
+            createSVG('circle', {
+                class: 'dependency-handle left',
+                cx: bar.getX() - this.dep_handle_margin - r,
+                cy,
+                r,
+                append_to: this.dependency_handle_group,
+            }),
+        );
 
-        this.dependency_handles.push(leftHandle);
-
-        const rightHandle = createSVG('g', {
-            class: 'dependency-handle .right',
-            append_to: this.dependency_handle_group,
-        });
-        const rightHandleCenterX =
-            bar.getEndX() + handle_width / 2 + handle_margin;
-        const rightHandleCenterY = bar.getY() + this.height / 2;
-        createSVG('circle', {
-            cx: rightHandleCenterX,
-            cy: rightHandleCenterY,
-            r: this.height,
-            class: 'background',
-            append_to: rightHandle,
-        });
-        createSVG('path', {
-            width: 24,
-            height: 24,
-            d: `M${rightHandleCenterX + 6} ${rightHandleCenterY} l-6 8 m6 -8 l-6 -8`,
-            class: 'arrow',
-            append_to: rightHandle,
-        });
-        this.dependency_handles.push(rightHandle);
+        this.dependency_handles.push(
+            createSVG('circle', {
+                class: 'dependency-handle right',
+                cx: bar.getX() + bar.getWidth() + this.dep_handle_margin + r,
+                cy,
+                r,
+                append_to: this.dependency_handle_group,
+            }),
+        );
 
         for (let handle of this.dependency_handles) {
             $.on(handle, 'mouseenter', () => handle.classList.add('active'));
@@ -523,8 +497,9 @@ export default class Bar {
                     this,
                     handle,
                 ]);
+                const from_point = { x: e.offsetX, y: e.offsetY };
 
-                new DummyArrow(this.gantt, this);
+                new DummyArrow(this.gantt, this, from_point);
             });
         }
     }
@@ -867,10 +842,20 @@ export default class Bar {
             .setAttribute('x', bar.getEndX());
         this.dependency_handle_group
             .querySelector('.dependency-handle.left')
-            .setAttribute('x', bar.getX() - handle_margin);
+            .setAttribute(
+                'cx',
+                bar.getX() - this.dep_handle_margin - DEP_HANDLE_SIZE / 2,
+            );
         this.dependency_handle_group
             .querySelector('.dependency-handle.right')
-            .setAttribute('x', bar.getEndX() + handle_margin);
+            .setAttribute(
+                'cx',
+                bar.getX() +
+                    bar.getWidth() +
+                    this.dep_handle_margin +
+                    DEP_HANDLE_SIZE / 2,
+            );
+
         const handle = this.group.querySelector('.handle.progress');
         handle && handle.setAttribute('cx', this.$bar_progress.getEndX());
     }
