@@ -352,38 +352,66 @@ export default class Bar {
     }
 
     draw_dependency_handles() {
-        if (this.invalid || this.gantt.options.readonly_dependency) return;
+        if (
+            this.invalid ||
+            this.gantt.options.readonly ||
+            this.gantt.options.readonly_dependency
+        )
+            return;
+
+        this.dependency_handles = [];
 
         const bar = this.$bar;
-        const handle_width = 20;
-        this.dependency_handles = [];
-        if (!this.gantt.options.readonly_dates) {
-            this.dependency_handles.push(
-                createSVG('rect', {
-                    x: bar.getEndX() + handle_width / 2 + handle_margin,
-                    y: bar.getY() - this.height / 2,
-                    width: handle_width,
-                    height: this.height * 2,
-                    rx: 2,
-                    ry: 2,
-                    class: 'dependency-handle right',
-                    append_to: this.dependency_handle_group,
-                }),
-            );
 
-            this.dependency_handles.push(
-                createSVG('rect', {
-                    x: bar.getX() - handle_width / 2 - handle_margin,
-                    y: bar.getY() - this.height / 2,
-                    width: handle_width,
-                    height: this.height * 2,
-                    rx: 2,
-                    ry: 2,
-                    class: 'dependency-handle left',
-                    append_to: this.dependency_handle_group,
-                }),
-            );
-        }
+        const handle_width = 24;
+
+        const leftHandleCenterX = bar.getX() - handle_width / 2 - handle_margin;
+        const leftHandleCenterY = bar.getY() + this.height / 2;
+        const leftHandle = createSVG('g', {
+            class: 'dependency-handle .left',
+            append_to: this.dependency_handle_group,
+            x: leftHandleCenterX,
+            y: leftHandleCenterY,
+        });
+        createSVG('circle', {
+            cx: leftHandleCenterX,
+            cy: leftHandleCenterY,
+            r: this.height,
+            class: 'background',
+            append_to: leftHandle,
+        });
+        createSVG('path', {
+            width: 24,
+            height: 24,
+            d: `M${leftHandleCenterX - 6} ${leftHandleCenterY} l6 8 m-6 -8 l6 -8`,
+            class: 'arrow',
+            append_to: leftHandle,
+        });
+
+        this.dependency_handles.push(leftHandle);
+
+        const rightHandle = createSVG('g', {
+            class: 'dependency-handle .right',
+            append_to: this.dependency_handle_group,
+        });
+        const rightHandleCenterX =
+            bar.getEndX() + handle_width / 2 + handle_margin;
+        const rightHandleCenterY = bar.getY() + this.height / 2;
+        createSVG('circle', {
+            cx: rightHandleCenterX,
+            cy: rightHandleCenterY,
+            r: this.height,
+            class: 'background',
+            append_to: rightHandle,
+        });
+        createSVG('path', {
+            width: 24,
+            height: 24,
+            d: `M${rightHandleCenterX + 6} ${rightHandleCenterY} l-6 8 m6 -8 l-6 -8`,
+            class: 'arrow',
+            append_to: rightHandle,
+        });
+        this.dependency_handles.push(rightHandle);
 
         for (let handle of this.dependency_handles) {
             $.on(handle, 'mouseenter', () => handle.classList.add('active'));

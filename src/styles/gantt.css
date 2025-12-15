@@ -406,14 +406,18 @@
                 opacity: 1;
             }
         }
-        & .dependency-handle-group{
-          background-color: red;
-        }
 
         & .dependency-handle {
-            fill: var(--g-handle-color);
-            opacity: 0.1;
             transition: opacity 0.3s ease;
+
+            & .background {
+                opacity: 0.05;
+            }
+
+            & .arrow {
+                stroke: var(--g-handle-color);
+                opacity: 0.1;
+            }
 
             &.left {
                 padding-right: 10px;
@@ -423,10 +427,13 @@
                 padding-left: 10px;
             }
 
-            &.active,
-            &.visible {
-                cursor: ew-resize;
-                opacity: 1;
+            &.active {
+                & .arrow {
+                    opacity: 0.5;
+                }
+                & .background {
+                    opacity: 0.1;
+                }
             }
         }
 

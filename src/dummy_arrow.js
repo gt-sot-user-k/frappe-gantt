@@ -32,6 +32,9 @@ export default class DummyArrow {
 
             this.gantt.layers.arrow.removeChild(this.element);
             const to_task_bar_wrapper = e.target.closest('.bar-wrapper');
+            if (!to_task_bar_wrapper) {
+                return;
+            }
             const to_task_id = to_task_bar_wrapper?.getAttribute('data-id');
             const to_task = this.gantt.get_task(to_task_id);
             if (!to_task) {
