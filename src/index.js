@@ -88,6 +88,14 @@ import './styles/gantt.css';
  */
 
 /**
+ * @typedef {Object} Arrow
+ * @property {Task} from_task - Start (parent) arrow task
+ * @property {Task} to_task - End (child) arrow task
+ * @property {Object} element - Unique identifier for the task
+ * @property {string} path - "d" attribute value of path element
+ */
+
+/**
  * Throttle function to limit function execution frequency
  * @param {Function} fn - Function to throttle
  * @param {number} wait - Wait time in milliseconds

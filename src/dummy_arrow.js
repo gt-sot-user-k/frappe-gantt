@@ -1,4 +1,4 @@
-import { createSVG } from './svg_utils';
+import { createSVG, $ } from './svg_utils';
 import Arrow from './arrow';
 
 export default class DummyArrow {
@@ -27,10 +27,8 @@ export default class DummyArrow {
             this.update();
         };
         const mouseupHandler = (e) => {
-            this.gantt.$container.removeEventListener(
-                'mousemove',
-                mousemoveHandler,
-            );
+            $.off(this.gantt.$container, 'mousemove', mousemoveHandler);
+            $.off(document, 'mouseup', documentMouseupHandler);
 
             if (this.gantt.layers.arrow?.contains(this.element)) {
                 this.gantt.layers.arrow.removeChild(this.element);
@@ -50,8 +48,20 @@ export default class DummyArrow {
             ]);
         };
 
-        this.gantt.$container.addEventListener('mousemove', mousemoveHandler);
-        this.gantt.$container.addEventListener('mouseup', mouseupHandler);
+        const documentMouseupHandler = (e) => {
+            $.off(this.gantt.$container, 'mousemove', mousemoveHandler);
+            $.off(document, 'mouseup', mouseupHandler);
+
+            if (!this.gantt.$container.contains(e.target)) {
+                if (this.gantt.layers.arrow?.contains(this.element)) {
+                    this.gantt.layers.arrow.removeChild(this.element);
+                }
+            }
+        };
+
+        $.on(this.gantt.$container, 'mousemove', mousemoveHandler);
+        $.on(this.gantt.$container, 'mouseup', mouseupHandler);
+        $.off(document, 'mouseup', documentMouseupHandler);
     }
 
     calculate_path() {

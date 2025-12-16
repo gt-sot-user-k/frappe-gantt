@@ -352,7 +352,12 @@
         & .arrow {
             fill: none;
             stroke: var(--g-arrow-color);
-            stroke-width: 1.5;
+            stroke-width: 3.5;
+            cursor: pointer;
+            & :hover {
+                transition: stroke-width 0.1s ease;
+                stroke-width: 7;
+            }
         }
 
         & .bar-wrapper .bar {

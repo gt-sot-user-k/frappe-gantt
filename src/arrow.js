@@ -1,4 +1,4 @@
-import { createSVG } from './svg_utils';
+import { createSVG, $ } from './svg_utils';
 
 export default class Arrow {
     constructor(gantt, from_task, to_task) {
@@ -8,6 +8,7 @@ export default class Arrow {
 
         this.calculate_path();
         this.draw();
+        this.setup_listeners();
     }
 
     calculate_path() {
@@ -97,6 +98,12 @@ export default class Arrow {
             'data-from': this.from_task.task.id,
             'data-to': this.to_task.task.id,
         });
+    }
+
+    setup_listeners() {
+        $.on(this.element, 'contextmenu', (e) =>
+            this.gantt.trigger_event('arrow_rclick', [e, this]),
+        );
     }
 
     update() {
