@@ -49,7 +49,7 @@ export default class DummyArrow {
             if (!to_task) {
                 console.warn('the target was not found');
             }
-            if (this.from_task.id && to_task_id) {
+            if (this.from_task.task.id !== to_task_id) {
                 this.gantt.trigger_event('create_dependency', [
                     this.from_task.task,
                     to_task,

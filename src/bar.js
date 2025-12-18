@@ -499,7 +499,7 @@ export default class Bar {
                 // Left button click
                 if (e.button === 0) {
                     e.stopPropagation();
-                    this.gantt.trigger_event('dependency_handle_click', [
+                    this.gantt.trigger_event('dependency_handle_mousedown', [
                         this,
                         handle,
                     ]);
