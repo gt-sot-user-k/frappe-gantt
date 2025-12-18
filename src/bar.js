@@ -533,13 +533,13 @@ export default class Bar {
         }
 
         if (x) {
-            const xs = this.task.dependencies.map((dep) => {
-                return this.gantt.get_bar(dep).$bar.getX();
-            });
-            const valid_x = xs.reduce((prev, curr) => {
-                return prev && x >= curr;
-            }, true);
-            if (!valid_x) return;
+            // const xs = this.task.dependencies.map((dep) => {
+            //     return this.gantt.get_bar(dep).$bar.getX();
+            // });
+            // const valid_x = xs.reduce((prev, curr) => {
+            //     return prev && x >= curr;
+            // }, true);
+            // if (!valid_x) return;
             this.update_attr(bar, 'x', x);
             this.x = x;
             this.$date_highlight.style.left = x + 'px';
