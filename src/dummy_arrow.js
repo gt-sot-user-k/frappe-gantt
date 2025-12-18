@@ -27,14 +27,21 @@ export default class DummyArrow {
             this.update();
         };
         const mouseupHandler = (e) => {
+            e.stopPropagation();
             $.off(this.gantt.$container, 'mousemove', mousemoveHandler);
+            $.off(this.gantt.$container, 'mouseup', mouseupHandler);
             $.off(document, 'mouseup', documentMouseupHandler);
 
             if (this.gantt.layers.arrow?.contains(this.element)) {
                 this.gantt.layers.arrow.removeChild(this.element);
             }
+
             const to_task_bar_wrapper = e.target.closest('.bar-wrapper');
-            if (!to_task_bar_wrapper) {
+            if (
+                !to_task_bar_wrapper ||
+                e.button !== 0 ||
+                !e.target.closest('.dependency-handle')
+            ) {
                 return;
             }
             const to_task_id = to_task_bar_wrapper?.getAttribute('data-id');
@@ -49,8 +56,10 @@ export default class DummyArrow {
         };
 
         const documentMouseupHandler = (e) => {
+            e.stopPropagation();
             $.off(this.gantt.$container, 'mousemove', mousemoveHandler);
-            $.off(document, 'mouseup', mouseupHandler);
+            $.off(this.gantt.$container, 'mouseup', mouseupHandler);
+            $.off(document, 'mouseup', documentMouseupHandler);
 
             if (!this.gantt.$container.contains(e.target)) {
                 if (this.gantt.layers.arrow?.contains(this.element)) {
@@ -59,9 +68,10 @@ export default class DummyArrow {
             }
         };
 
+        console.log('constructor');
         $.on(this.gantt.$container, 'mousemove', mousemoveHandler);
         $.on(this.gantt.$container, 'mouseup', mouseupHandler);
-        $.off(document, 'mouseup', documentMouseupHandler);
+        $.on(document, 'mouseup', documentMouseupHandler);
     }
 
     calculate_path() {

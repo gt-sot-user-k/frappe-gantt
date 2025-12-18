@@ -2,7 +2,7 @@ import DummyArrow from './dummy_arrow';
 import date_utils from './date_utils';
 import { $, createSVG, animateSVG } from './svg_utils';
 
-const DEP_HANDLE_SIZE = 10.5;
+const DEP_HANDLE_SIZE = 35;
 
 /**
  * Represents a task bar in the Gantt chart
@@ -44,7 +44,7 @@ export default class Bar {
         this.gantt = gantt;
         this.task = task;
         this.name = this.name || '';
-        this.dep_handle_margin = 12;
+        this.dep_handle_margin = 7;
     }
 
     prepare_wrappers() {
@@ -305,7 +305,7 @@ export default class Bar {
         if (this.invalid || this.gantt.options.readonly) return;
 
         const bar = this.$bar;
-        const handle_width = 3;
+        const handle_width = 10.5;
         this.resize_handles = [];
         if (!this.gantt.options.readonly_dates) {
             this.resize_handles.push(
@@ -374,6 +374,7 @@ export default class Bar {
                 cy,
                 r,
                 append_to: this.dependency_handle_group,
+                'data-placement': 'left',
             }),
         );
 
@@ -384,6 +385,7 @@ export default class Bar {
                 cy,
                 r,
                 append_to: this.dependency_handle_group,
+                'data-placement': 'right',
             }),
         );
 
@@ -493,13 +495,17 @@ export default class Bar {
         for (const handle of this.dependency_handles) {
             let arrow;
             $.on(handle, 'mousedown', (e) => {
-                this.gantt.trigger_event('dependency_handle_click', [
-                    this,
-                    handle,
-                ]);
-                const from_point = { x: e.offsetX, y: e.offsetY };
+                // Left button click
+                if (e.button === 0) {
+                    e.stopPropagation();
+                    this.gantt.trigger_event('dependency_handle_click', [
+                        this,
+                        handle,
+                    ]);
+                    const from_point = { x: e.offsetX, y: e.offsetY };
 
-                new DummyArrow(this.gantt, this, from_point);
+                    new DummyArrow(this.gantt, this, from_point);
+                }
             });
         }
     }

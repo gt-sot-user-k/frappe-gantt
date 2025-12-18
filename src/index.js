@@ -82,6 +82,7 @@ import './styles/gantt.css';
  * @property {Function} [on_progress_change] - Progress change event handler
  * @property {Function} [on_view_change] - View mode change event handler
  * @property {Function} [on_create_dependency] - Create new dependency arrow event handler
+ * @property {Function} [on_arrow_rclick] - Right click arrow event handler
  * @property {Object} [labels] - Label configuration
  * @property {string} [header_mount] - Header element mount point selector
  * @property {string} [scroll_element_selector] - Set element for scrolling observe
