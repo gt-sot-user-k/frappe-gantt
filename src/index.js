@@ -1445,18 +1445,13 @@ export default class Gantt {
         };
 
         let pos = 0;
-        $.on(
-            this.$svg,
-            'mousemove',
-            '.bar-group, .resize-handle, dependency-handle',
-            (e) => {
-                if (
-                    this.bar_being_dragged === false &&
-                    Math.abs((e.offsetX || e.layerX) - pos) > 10
-                )
-                    this.bar_being_dragged = true;
-            },
-        );
+        $.on(this.$svg, 'mousemove', '.bar-group, .resize-handle', (e) => {
+            if (
+                this.bar_being_dragged === false &&
+                Math.abs((e.offsetX || e.layerX) - pos) > 10
+            )
+                this.bar_being_dragged = true;
+        });
 
         $.on(
             this.$svg,

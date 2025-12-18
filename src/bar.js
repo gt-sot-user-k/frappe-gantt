@@ -4,6 +4,8 @@ import { $, createSVG, animateSVG } from './svg_utils';
 
 const DEP_HANDLE_SIZE = 35;
 
+const RESIZE_HANDLE_SIZE = 10.5;
+
 /**
  * Represents a task bar in the Gantt chart
  * @class
@@ -305,14 +307,13 @@ export default class Bar {
         if (this.invalid || this.gantt.options.readonly) return;
 
         const bar = this.$bar;
-        const handle_width = 10.5;
         this.resize_handles = [];
         if (!this.gantt.options.readonly_dates) {
             this.resize_handles.push(
                 createSVG('rect', {
-                    x: bar.getEndX() - handle_width / 2,
+                    x: bar.getEndX() - RESIZE_HANDLE_SIZE / 2,
                     y: bar.getY() + this.height / 4,
-                    width: handle_width,
+                    width: RESIZE_HANDLE_SIZE,
                     height: this.height / 2,
                     rx: 2,
                     ry: 2,
@@ -323,9 +324,9 @@ export default class Bar {
 
             this.resize_handles.push(
                 createSVG('rect', {
-                    x: bar.getX() - handle_width / 2,
+                    x: bar.getX() - RESIZE_HANDLE_SIZE / 2,
                     y: bar.getY() + this.height / 4,
-                    width: handle_width,
+                    width: RESIZE_HANDLE_SIZE,
                     height: this.height / 2,
                     rx: 2,
                     ry: 2,
@@ -842,10 +843,10 @@ export default class Bar {
         const bar = this.$bar;
         this.resize_handle_group
             .querySelector('.resize-handle.left')
-            .setAttribute('x', bar.getX());
+            .setAttribute('x', bar.getX() - RESIZE_HANDLE_SIZE / 2);
         this.resize_handle_group
             .querySelector('.resize-handle.right')
-            .setAttribute('x', bar.getEndX());
+            .setAttribute('x', bar.getEndX() - RESIZE_HANDLE_SIZE / 2);
         this.dependency_handle_group
             .querySelector('.dependency-handle.left')
             .setAttribute(
