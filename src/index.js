@@ -482,40 +482,36 @@ export default class Gantt {
         gantt_start = date_utils.start_of(gantt_start, this.config.unit);
         gantt_end = date_utils.start_of(gantt_end, this.config.unit);
 
-        if (!refresh) {
-            if (!this.options.infinite_padding) {
-                if (typeof this.config.view_mode.padding === 'string')
-                    this.config.view_mode.padding = [
-                        this.config.view_mode.padding,
-                        this.config.view_mode.padding,
-                    ];
+        if (!this.options.infinite_padding) {
+            if (typeof this.config.view_mode.padding === 'string')
+                this.config.view_mode.padding = [
+                    this.config.view_mode.padding,
+                    this.config.view_mode.padding,
+                ];
 
-                let [padding_start, padding_end] =
-                    this.config.view_mode.padding.map(
-                        date_utils.parse_duration,
-                    );
-                this.gantt_start = date_utils.add(
-                    gantt_start,
-                    -padding_start.duration,
-                    padding_start.scale,
-                );
-                this.gantt_end = date_utils.add(
-                    gantt_end,
-                    padding_end.duration,
-                    padding_end.scale,
-                );
-            } else {
-                this.gantt_start = date_utils.add(
-                    gantt_start,
-                    -this.config.extend_by_units * 3,
-                    this.config.unit,
-                );
-                this.gantt_end = date_utils.add(
-                    gantt_end,
-                    this.config.extend_by_units * 3,
-                    this.config.unit,
-                );
-            }
+            let [padding_start, padding_end] =
+                this.config.view_mode.padding.map(date_utils.parse_duration);
+            this.gantt_start = date_utils.add(
+                gantt_start,
+                -padding_start.duration,
+                padding_start.scale,
+            );
+            this.gantt_end = date_utils.add(
+                gantt_end,
+                padding_end.duration,
+                padding_end.scale,
+            );
+        } else {
+            this.gantt_start = date_utils.add(
+                gantt_start,
+                -this.config.extend_by_units * 3,
+                this.config.unit,
+            );
+            this.gantt_end = date_utils.add(
+                gantt_end,
+                this.config.extend_by_units * 3,
+                this.config.unit,
+            );
         }
         this.config.date_format =
             this.config.view_mode.date_format || this.options.date_format;
