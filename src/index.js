@@ -2094,6 +2094,20 @@ export default class Gantt {
     }
 
     /**
+     * Get the effective height of every row, keyed by task id.
+     * @returns {Object.<string, number>} Map of task id to row height in pixels
+     */
+    getRowHeights() {
+        const heights = {};
+        const default_height =
+            this.options.bar_height + this.options.padding;
+        for (let task of this.tasks) {
+            heights[task.id] = task.row_height || default_height;
+        }
+        return heights;
+    }
+
+    /**
      * Get the height of a specific row
      * @param {number} taskIndex - Task index
      * @returns {number} Row height in pixels
