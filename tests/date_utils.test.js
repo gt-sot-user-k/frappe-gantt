@@ -113,6 +113,46 @@ test('StartOf', () => {
     );
 });
 
+test('Add: advances sub-day scales (hour/minute/second)', () => {
+    const base = date_utils.parse('2024-01-01 00:00:00');
+
+    expect(date_utils.format(date_utils.add(base, 1, 'hour'), 'YYYY-MM-DD HH:mm')).toBe(
+        '2024-01-01 01:00',
+    );
+    expect(date_utils.format(date_utils.add(base, 6, 'hour'), 'YYYY-MM-DD HH:mm')).toBe(
+        '2024-01-01 06:00',
+    );
+    expect(date_utils.format(date_utils.add(base, 12, 'hour'), 'YYYY-MM-DD HH:mm')).toBe(
+        '2024-01-01 12:00',
+    );
+    expect(date_utils.format(date_utils.add(base, 30, 'minute'), 'YYYY-MM-DD HH:mm')).toBe(
+        '2024-01-01 00:30',
+    );
+    expect(
+        date_utils.format(date_utils.add(base, 90, 'second'), 'YYYY-MM-DD HH:mm:ss'),
+    ).toBe('2024-01-01 00:01:30');
+});
+
+test('Add: advances day/month/year on calendar boundaries', () => {
+    const base = date_utils.parse('2024-01-15 00:00:00');
+
+    expect(date_utils.format(date_utils.add(base, 1, 'day'), 'YYYY-MM-DD')).toBe(
+        '2024-01-16',
+    );
+    expect(date_utils.format(date_utils.add(base, 1, 'month'), 'YYYY-MM-DD')).toBe(
+        '2024-02-15',
+    );
+    expect(date_utils.format(date_utils.add(base, 1, 'year'), 'YYYY-MM-DD')).toBe(
+        '2025-01-15',
+    );
+});
+
+test('Add: does not mutate the input date', () => {
+    const base = date_utils.parse('2024-01-01 00:00:00');
+    date_utils.add(base, 5, 'hour');
+    expect(date_utils.format(base, 'YYYY-MM-DD HH:mm')).toBe('2024-01-01 00:00');
+});
+
 test('format', () => {
     const date = date_utils.parse('2017-08-12 15:07:23');
     expect(date_utils.format(date, 'YYYY-MM-DD')).toBe('2017-08-12');

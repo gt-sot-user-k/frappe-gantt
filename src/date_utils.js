@@ -249,9 +249,19 @@ export default {
     },
 
     add(date, qty, scale) {
-        const result = new Date(date);
-        result.setDate(date.getDate() + TO_DAYS[scale] * qty);
-        return result;
+        qty = parseInt(qty, 10);
+        const index = {
+            [YEAR]: 0,
+            [MONTH]: 1,
+            [DAY]: 2,
+            [HOUR]: 3,
+            [MINUTE]: 4,
+            [SECOND]: 5,
+            [MILLISECOND]: 6,
+        }[scale];
+        const vals = this.get_date_values(date);
+        vals[index] += qty;
+        return new Date(...vals);
     },
 
     start_of(date, scale) {

@@ -107,7 +107,7 @@ export default class Bar {
     prepare_expected_progress_values() {
         this.compute_expected_progress();
         this.expected_progress_width =
-            this.gantt.options.column_width *
+            this.gantt.config.column_width *
                 this.duration *
                 (this.expected_progress / 100) || 0;
     }

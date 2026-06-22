@@ -119,15 +119,15 @@ $.closest = (selector, element) => {
 };
 
 $.attr = (element, attr, value) => {
-    if (!value && typeof attr === 'string') {
-        return element.getAttribute(attr);
-    }
-
     if (typeof attr === 'object') {
         for (let key in attr) {
             $.attr(element, key, attr[key]);
         }
         return;
+    }
+
+    if (value === undefined) {
+        return element.getAttribute(attr);
     }
 
     element.setAttribute(attr, value);

@@ -202,11 +202,12 @@ export default class Gantt {
         const element = opts.header_mount;
         if (element) {
             const headerMountCandidate = document.querySelector(element);
-            headerMountCandidate.classList.add('gantt-header-container');
             if (headerMountCandidate) {
+                headerMountCandidate.classList.add('gantt-header-container');
                 this.$header_container = headerMountCandidate;
             } else {
                 console.warn("options.header_mount defined, but wasn't found");
+                this.$header_container = this.$container;
             }
         } else {
             this.$header_container = this.$container;
@@ -969,9 +970,11 @@ export default class Gantt {
         this.highlight_holidays();
         this.config.ignored_positions = [];
 
-        const height =
-            (this.options.bar_height + this.options.padding) *
-            this.tasks.length;
+        // Sum per-row heights so highlights honor custom row heights
+        let height = 0;
+        for (let i = 0; i < this.tasks.length; i++) {
+            height += this.getRowHeight(i);
+        }
         // Only insert the pattern if it doesn't already exist
         if (!this.$svg.querySelector('#diagonalHatch')) {
             this.layers.grid.innerHTML += `<pattern id="diagonalHatch" patternUnits="userSpaceOnUse" width="4" height="4">
@@ -1233,21 +1236,28 @@ export default class Gantt {
             (el) => el.textContent === current_upper,
         );
 
-        this.current_date = date_utils.add(
-            this.gantt_start,
-            ((this.$container.scrollLeft + $el.clientWidth) /
-                this.config.column_width) *
-                this.config.step,
-            this.config.unit,
-        );
-        current_upper = this.config.view_mode.upper_text(
-            this.current_date,
-            null,
-            this.options.language,
-        );
-        $el = this.upperTexts.find((el) => el.textContent === current_upper);
-        $el.classList.add('current-upper');
-        this.$current = $el;
+        if ($el) {
+            this.current_date = date_utils.add(
+                this.gantt_start,
+                ((this.$container.scrollLeft + $el.clientWidth) /
+                    this.config.column_width) *
+                    this.config.step,
+                this.config.unit,
+            );
+            current_upper = this.config.view_mode.upper_text(
+                this.current_date,
+                null,
+                this.options.language,
+            );
+            $el = this.upperTexts.find(
+                (el) => el.textContent === current_upper,
+            );
+        }
+
+        if ($el) {
+            $el.classList.add('current-upper');
+            this.$current = $el;
+        }
     }
 
     scroll_current() {
@@ -1928,7 +1938,7 @@ export default class Gantt {
         }
 
         if (Array.isArray(modes)) {
-            return modes.some(view_is);
+            return modes.some((mode) => this.view_is(mode));
         }
 
         return this.config.view_mode.name === modes.name;
@@ -2116,8 +2126,9 @@ export default class Gantt {
             return;
         }
 
-        // Remove custom height
-        this.row_heights.delete(taskIndex);
+        // Remove custom height (stored on the task by updateRowHeight)
+        const task = this.tasks[taskIndex];
+        if (task) delete task.row_height;
 
         // Re-render to apply changes
         this._preserveLabelState = true;

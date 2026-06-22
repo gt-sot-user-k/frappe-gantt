@@ -324,53 +324,75 @@ export default class Label {
     }
 
     setup_scroll_sync() {
-        if (this.$labels_scroll && this.gantt && this.gantt.$container) {
-            let isSyncingScroll = false;
+        if (!(this.$labels_scroll && this.gantt && this.gantt.$container))
+            return;
 
-            this.$labels_scroll.addEventListener('scroll', () => {
-                if (
-                    isSyncingScroll ||
-                    !this.$labels_scroll ||
-                    !this.gantt ||
-                    !this.gantt.$container
-                )
-                    return;
-                isSyncingScroll = true;
-                this.gantt._isSyncingLabelScroll = true;
-                if (
-                    this.$labels_scroll &&
-                    this.gantt &&
-                    this.gantt.$container
-                ) {
-                    this.gantt.$container.scrollTop =
-                        this.$labels_scroll.scrollTop;
-                }
-                this.gantt._isSyncingLabelScroll = false;
-                isSyncingScroll = false;
-            });
+        // Detach handlers from a previous sync setup so they don't accumulate.
+        // $labels_scroll is recreated each refresh, but $container persists, so
+        // re-binding without cleanup would stack listeners on every refresh.
+        this.teardown_scroll_sync();
 
-            this.gantt.$container.addEventListener('scroll', () => {
-                if (
-                    isSyncingScroll ||
-                    !this.$labels_scroll ||
-                    !this.gantt ||
-                    !this.gantt.$container
-                )
-                    return;
-                isSyncingScroll = true;
-                this.gantt._isSyncingLabelScroll = true;
-                if (
-                    this.$labels_scroll &&
-                    this.gantt &&
-                    this.gantt.$container
-                ) {
-                    this.$labels_scroll.scrollTop =
-                        this.gantt.$container.scrollTop;
-                }
-                this.gantt._isSyncingLabelScroll = false;
-                isSyncingScroll = false;
-            });
+        let isSyncingScroll = false;
+
+        this._labelsScrollHandler = () => {
+            if (
+                isSyncingScroll ||
+                !this.$labels_scroll ||
+                !this.gantt ||
+                !this.gantt.$container
+            )
+                return;
+            isSyncingScroll = true;
+            this.gantt._isSyncingLabelScroll = true;
+            this.gantt.$container.scrollTop = this.$labels_scroll.scrollTop;
+            this.gantt._isSyncingLabelScroll = false;
+            isSyncingScroll = false;
+        };
+
+        this._containerScrollHandler = () => {
+            if (
+                isSyncingScroll ||
+                !this.$labels_scroll ||
+                !this.gantt ||
+                !this.gantt.$container
+            )
+                return;
+            isSyncingScroll = true;
+            this.gantt._isSyncingLabelScroll = true;
+            this.$labels_scroll.scrollTop = this.gantt.$container.scrollTop;
+            this.gantt._isSyncingLabelScroll = false;
+            isSyncingScroll = false;
+        };
+
+        this._syncedLabelsScroll = this.$labels_scroll;
+        this._syncedContainer = this.gantt.$container;
+        this._syncedLabelsScroll.addEventListener(
+            'scroll',
+            this._labelsScrollHandler,
+        );
+        this._syncedContainer.addEventListener(
+            'scroll',
+            this._containerScrollHandler,
+        );
+    }
+
+    teardown_scroll_sync() {
+        if (this._syncedLabelsScroll && this._labelsScrollHandler) {
+            this._syncedLabelsScroll.removeEventListener(
+                'scroll',
+                this._labelsScrollHandler,
+            );
         }
+        if (this._syncedContainer && this._containerScrollHandler) {
+            this._syncedContainer.removeEventListener(
+                'scroll',
+                this._containerScrollHandler,
+            );
+        }
+        this._labelsScrollHandler = null;
+        this._containerScrollHandler = null;
+        this._syncedLabelsScroll = null;
+        this._syncedContainer = null;
     }
 
     create_resize_handle() {
@@ -509,6 +531,7 @@ export default class Label {
     }
 
     remove() {
+        this.teardown_scroll_sync();
         if (this.$label_field) {
             this.$label_field.remove();
             this.$label_field = null;
