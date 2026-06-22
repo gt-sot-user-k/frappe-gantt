@@ -2127,8 +2127,7 @@ export default class Gantt {
      */
     getRowHeights() {
         const heights = {};
-        const default_height =
-            this.options.bar_height + this.options.padding;
+        const default_height = this.options.bar_height + this.options.padding;
         for (let task of this.tasks) {
             heights[task.id] = task.row_height || default_height;
         }

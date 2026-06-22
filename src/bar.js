@@ -731,8 +731,7 @@ export default class Bar {
         }
 
         const row_height = heights[this.task.id];
-        this.y =
-            row_top + (row_height - this.gantt.options.bar_height) / 2;
+        this.y = row_top + (row_height - this.gantt.options.bar_height) / 2;
     }
 
     compute_duration() {
