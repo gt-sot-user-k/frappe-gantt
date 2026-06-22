@@ -92,10 +92,10 @@ import './styles/gantt.css';
 
 /**
  * @typedef {Object} Arrow
- * @property {Task} from_task - Start (parent) arrow task
- * @property {Task} to_task - End (child) arrow task
- * @property {Object} element - Unique identifier for the task
- * @property {string} path - "d" attribute value of path element
+ * @property {{ task: Task }} from_task - Start (parent) bar the arrow originates from; `.task` holds the task data
+ * @property {{ task: Task }} to_task - End (child) bar the arrow points to; `.task` holds the task data
+ * @property {SVGElement} element - The arrow's SVG path element
+ * @property {string} path - "d" attribute value of the path element
  */
 
 /**
@@ -137,6 +137,7 @@ export default class Gantt {
      * @param {GanttOptions} [options] - Chart configuration options
      */
     constructor(wrapper, tasks, options) {
+        log_version();
         this.setup_wrapper(wrapper);
         this.setup_header_wrapper(options);
         this.setup_options(options);
@@ -2214,6 +2215,16 @@ Gantt.VIEW_MODE = {
     MONTH: DEFAULT_VIEW_MODES[5],
     YEAR: DEFAULT_VIEW_MODES[6],
 };
+
+let version_logged = false;
+function log_version() {
+    if (version_logged) return;
+    version_logged = true;
+    // __GANTT_VERSION__ is injected from package.json at build/test time
+    const version =
+        typeof __GANTT_VERSION__ !== 'undefined' ? __GANTT_VERSION__ : 'dev';
+    console.log(`@gts-ui/chart-gantt v${version}`);
+}
 
 function generate_id(task) {
     return task.name + '_' + Math.random().toString(36).slice(2, 12);
