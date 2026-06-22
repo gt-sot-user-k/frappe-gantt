@@ -42,3 +42,35 @@ test('resetRowHeight clears a custom row height without throwing', () => {
     expect(task.row_height).toBeUndefined();
     expect(rendered).toBe(true);
 });
+
+test('setup_row_heights seeds the store from the option, skipping invalid', () => {
+    const ctx = { options: { row_heights: { a: 100, b: -5, c: 'x' } } };
+
+    Gantt.prototype.setup_row_heights.call(ctx);
+
+    expect(ctx.row_heights).toEqual({ a: 100 });
+});
+
+test('setup_row_heights is idempotent (does not wipe runtime values)', () => {
+    const ctx = {
+        row_heights: { a: 80 },
+        options: { row_heights: { a: 100 } },
+    };
+
+    Gantt.prototype.setup_row_heights.call(ctx);
+
+    expect(ctx.row_heights).toEqual({ a: 80 });
+});
+
+test('setup_tasks re-applies stored row heights to new task objects', () => {
+    const ctx = {
+        row_heights: { a: 120 },
+        setup_dependencies() {},
+    };
+
+    Gantt.prototype.setup_tasks.call(ctx, [
+        { id: 'a', start: '2024-01-01', end: '2024-01-02' },
+    ]);
+
+    expect(ctx.tasks[0].row_height).toBe(120);
+});

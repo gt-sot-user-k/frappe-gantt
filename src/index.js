@@ -217,6 +217,7 @@ export default class Gantt {
     setup_options(options) {
         this.original_options = options;
         this.options = { ...DEFAULT_OPTIONS, ...options };
+        this.setup_row_heights();
 
         this.$scroll_element = this.options.scroll_element_selector
             ? document.querySelector(this.options.scroll_element_selector)
@@ -269,6 +270,20 @@ export default class Gantt {
             }
         } else {
             this.config.ignored_function = this.options.ignore;
+        }
+    }
+
+    setup_row_heights() {
+        if (this.row_heights) return; // keep runtime values across re-setup
+        this.row_heights = {};
+        const seed = this.options.row_heights || {};
+        for (let id in seed) {
+            const h = seed[id];
+            if (typeof h === 'number' && isFinite(h) && h > 0) {
+                this.row_heights[id] = h;
+            } else {
+                console.warn(`Invalid row_heights entry for "${id}": ${h}`);
+            }
         }
     }
 
@@ -360,6 +375,12 @@ export default class Gantt {
                 return task;
             })
             .filter((t) => t);
+        // Re-apply persisted custom heights to the (possibly new) task objects
+        for (let task of this.tasks) {
+            if (this.row_heights && this.row_heights[task.id] !== undefined) {
+                task.row_height = this.row_heights[task.id];
+            }
+        }
         this.setup_dependencies();
     }
 
