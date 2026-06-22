@@ -24,3 +24,39 @@ test('expected progress width uses the resolved column width', () => {
 
     expect(ctx.expected_progress_width).toBeGreaterThan(0);
 });
+
+test('compute_y centers the bar within a tall row', () => {
+    const gantt = {
+        config: { header_height: 0 },
+        options: { bar_height: 30, padding: 18 },
+        tasks: [{ id: 'a' }],
+        getRowHeights: () => ({ a: 100 }),
+    };
+    const ctx = {
+        gantt,
+        task: { id: 'a', _index: 0 },
+        compute_y: Bar.prototype.compute_y,
+    };
+
+    ctx.compute_y();
+
+    expect(ctx.y).toBe(35); // 0 + (100 - 30) / 2
+});
+
+test('compute_y keeps the legacy position for a default-height row', () => {
+    const gantt = {
+        config: { header_height: 60 },
+        options: { bar_height: 30, padding: 18 },
+        tasks: [{ id: 'a' }],
+        getRowHeights: () => ({ a: 48 }), // default = 30 + 18
+    };
+    const ctx = {
+        gantt,
+        task: { id: 'a', _index: 0 },
+        compute_y: Bar.prototype.compute_y,
+    };
+
+    ctx.compute_y();
+
+    expect(ctx.y).toBe(69); // 60 + (48 - 30)/2 == header_height + padding/2
+});

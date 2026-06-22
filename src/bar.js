@@ -721,16 +721,18 @@ export default class Bar {
     }
 
     compute_y() {
-        // Calculate Y position by summing up all previous row heights
-        let y =
-            this.gantt.config.header_height + this.gantt.options.padding / 2;
+        // Position the bar centered within its (possibly custom-height) row.
+        const heights = this.gantt.getRowHeights();
+        const tasks = this.gantt.tasks;
 
-        // Add heights of all previous rows
+        let row_top = this.gantt.config.header_height;
         for (let i = 0; i < this.task._index; i++) {
-            y += this.gantt.getRowHeight(i);
+            row_top += heights[tasks[i].id];
         }
 
-        this.y = y;
+        const row_height = heights[this.task.id];
+        this.y =
+            row_top + (row_height - this.gantt.options.bar_height) / 2;
     }
 
     compute_duration() {
