@@ -252,6 +252,36 @@ let tasks = [
 - Create visual hierarchy in complex project timelines
 - Display additional task metadata within larger rows
 
+## Row heights
+
+By default each row is `bar_height + padding` px tall. You can set per-row
+heights — useful when embedding the chart as a column inside a table whose rows
+have dynamic heights. Heights are keyed by **task id** and the bar is centered
+vertically within its row.
+
+```js
+// At construction
+const gantt = new Gantt('#gantt', tasks, {
+    row_heights: { task_a: 64, task_b: 120 },
+});
+
+// Sync from a host table (partial updates are fine — send only changed rows)
+gantt.setRowHeights({ task_a: 80, task_c: 96 });
+
+// Read the effective height of every row (custom or default), keyed by id
+gantt.getRowHeights(); // => { task_a: 80, task_b: 120, task_c: 96, ... }
+
+// Single row
+gantt.updateRowHeight('task_a', 72); // by id or index; returns the gantt
+gantt.resetRowHeight('task_a');      // back to default
+```
+
+`setRowHeights` and `updateRowHeight` return the chart instance for chaining.
+Invalid heights (non-positive / non-number) and unknown ids are ignored with a
+console warning. Custom heights **persist across `refresh(tasks)`** — they are
+re-applied to the new task objects by id, so you don't need to re-send them.
+Note: ids with spaces are normalized to underscores, so key by the normalized id.
+
 ## Development Setup
 If you want to contribute enhancements or fixes:
 
