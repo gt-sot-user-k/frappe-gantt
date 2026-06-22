@@ -180,107 +180,61 @@ The Gantt chart includes a built-in theme toggle that allows users to switch bet
 The theme system automatically applies appropriate colors for all chart elements including bars, grid lines, text, backgrounds, and interactive elements.
 
 ### Custom Row Heights
-The Gantt chart supports custom row heights for individual tasks, allowing you to create visually distinct rows for different tasks. This is useful when you need to emphasize certain tasks or accommodate varying amounts of content.
 
-**Setting Custom Row Heights:**
+By default each row is `bar_height + padding` px tall. You can set custom per-row
+heights — useful for emphasizing certain tasks, accommodating varying amounts of
+content, or embedding the chart as a column inside a table whose rows have dynamic
+heights. Heights are keyed by **task id** and the bar is centered vertically within
+its row.
 
-You can set a custom height for a specific task row using the `updateRowHeight()` method:
-
-```js
-// Set height by task ID
-gantt.updateRowHeight('task-1', 60);
-
-// Set height by task index
-gantt.updateRowHeight(0, 60);
-```
-
-**Getting Row Heights:**
-
-Retrieve the height of a specific row:
+**Set at construction:**
 
 ```js
-// Get height by task index
-const height = gantt.getRowHeight(0);
-console.log(height); // Returns custom height or default height
+const gantt = new Gantt('#gantt', tasks, {
+    row_heights: { 'task-1': 64, 'task-2': 120 },
+});
 ```
 
-**Resetting Row Heights:**
-
-Reset a row back to the default height:
-
-```js
-// Reset by task ID
-gantt.resetRowHeight('task-1');
-
-// Reset by task index
-gantt.resetRowHeight(0);
-```
-
-**Task Property:**
-
-Custom row heights are stored directly on the task object as the `row_height` property:
+You can also set `row_height` directly on a task object:
 
 ```js
 let tasks = [
-  {
-    id: 'task-1',
-    name: 'Important Task',
-    start: '2024-01-01',
-    end: '2024-01-05',
-    row_height: 60  // Custom height for this task
-  },
-  {
-    id: 'task-2',
-    name: 'Normal Task',
-    start: '2024-01-03',
-    end: '2024-01-08'
-    // Uses default height (bar_height + padding)
-  }
+  { id: 'task-1', name: 'Important Task', start: '2024-01-01', end: '2024-01-05', row_height: 60 },
+  { id: 'task-2', name: 'Normal Task', start: '2024-01-03', end: '2024-01-08' }, // default height
 ];
 ```
 
-**Features:**
-- **Automatic Re-rendering**: The chart automatically re-renders when row heights are updated
-- **Preserved State**: Label panel state is maintained during height updates
-- **Arrow Positioning**: Dependency arrows automatically adjust to custom row heights
-- **Grid Alignment**: Grid rows and lines properly align with custom heights
-- **Serialization**: Custom heights are part of the task object and can be serialized/deserialized
-
-**Example Use Cases:**
-- Emphasize critical path tasks with larger rows
-- Accommodate task labels with varying text lengths
-- Create visual hierarchy in complex project timelines
-- Display additional task metadata within larger rows
-
-## Row heights
-
-By default each row is `bar_height + padding` px tall. You can set per-row
-heights — useful when embedding the chart as a column inside a table whose rows
-have dynamic heights. Heights are keyed by **task id** and the bar is centered
-vertically within its row.
+**Set / sync at runtime:**
 
 ```js
-// At construction
-const gantt = new Gantt('#gantt', tasks, {
-    row_heights: { task_a: 64, task_b: 120 },
-});
+// Bulk, keyed by id — partial updates are fine (send only changed rows)
+gantt.setRowHeights({ 'task-1': 80, 'task-3': 96 });
 
-// Sync from a host table (partial updates are fine — send only changed rows)
-gantt.setRowHeights({ task_a: 80, task_c: 96 });
+// Single row, by id or index
+gantt.updateRowHeight('task-1', 72);
+gantt.updateRowHeight(0, 72);
 
-// Read the effective height of every row (custom or default), keyed by id
-gantt.getRowHeights(); // => { task_a: 80, task_b: 120, task_c: 96, ... }
-
-// Single row
-gantt.updateRowHeight('task_a', 72); // by id or index; returns the gantt
-gantt.resetRowHeight('task_a');      // back to default
+// Reset a row to the default height
+gantt.resetRowHeight('task-1');
+gantt.resetRowHeight(0);
 ```
 
-`setRowHeights` and `updateRowHeight` return the chart instance for chaining.
-Invalid heights (non-positive / non-number) and unknown ids are ignored with a
-console warning. Custom heights **persist across `refresh(tasks)`** — they are
-re-applied to the new task objects by id, so you don't need to re-send them.
-Note: ids with spaces are normalized to underscores, so key by the normalized id.
+**Read heights:**
+
+```js
+// Effective height of every row (custom or default), keyed by id
+gantt.getRowHeights(); // => { 'task-1': 80, 'task-2': 120, 'task-3': 96, ... }
+```
+
+**Behavior:**
+- `setRowHeights` and `updateRowHeight` return the chart instance for chaining.
+- Invalid heights (non-positive / non-number) and unknown ids are skipped with a
+  console message — never thrown.
+- Custom heights **persist across `refresh(tasks)`**: they are re-applied to the
+  new task objects by id, so you don't need to re-send them.
+- The chart re-renders automatically; label-panel state is preserved and dependency
+  arrows adjust to the new heights.
+- Ids with spaces are normalized to underscores — key by the normalized id.
 
 ## Development Setup
 If you want to contribute enhancements or fixes:
