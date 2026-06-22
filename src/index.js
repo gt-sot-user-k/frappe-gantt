@@ -2112,10 +2112,12 @@ export default class Gantt {
 
         // Store the custom height on the task object
         task.row_height = height;
+        this.row_heights[task.id] = height;
 
         // Re-render to apply changes
         this._preserveLabelState = true;
         this.render();
+        return this;
     }
 
     /**
@@ -2130,6 +2132,38 @@ export default class Gantt {
             heights[task.id] = task.row_height || default_height;
         }
         return heights;
+    }
+
+    /**
+     * Set heights for multiple rows at once, keyed by task id.
+     * Invalid heights and unknown ids are warned and skipped.
+     * @param {Object.<string, number>} heights - Map of task id to height (px)
+     * @returns {Gantt} this (for chaining)
+     */
+    setRowHeights(heights) {
+        if (typeof heights !== 'object' || heights === null) {
+            console.warn(
+                'setRowHeights expects an object of { taskId: height }',
+            );
+            return this;
+        }
+        for (let id in heights) {
+            const h = heights[id];
+            if (typeof h !== 'number' || !isFinite(h) || h <= 0) {
+                console.warn(`Invalid row height for "${id}": ${h}`);
+                continue;
+            }
+            const task = this.get_task(id);
+            if (!task) {
+                console.warn(`setRowHeights: task "${id}" not found`);
+                continue;
+            }
+            this.row_heights[id] = h;
+            task.row_height = h;
+        }
+        this._preserveLabelState = true;
+        this.render();
+        return this;
     }
 
     /**
@@ -2153,9 +2187,12 @@ export default class Gantt {
             return;
         }
 
-        // Remove custom height (stored on the task by updateRowHeight)
+        // Remove custom height (task field + persistent store)
         const task = this.tasks[taskIndex];
-        if (task) delete task.row_height;
+        if (task) {
+            delete task.row_height;
+            delete this.row_heights[task.id];
+        }
 
         // Re-render to apply changes
         this._preserveLabelState = true;
