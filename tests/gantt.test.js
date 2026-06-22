@@ -132,3 +132,24 @@ test('updateRowHeight updates the store and returns this', () => {
     expect(ctx.row_heights.a).toBe(64);
     expect(ret).toBe(ctx);
 });
+
+test('updateRowHeight rejects a non-finite height without writing', () => {
+    let rendered = false;
+    const task = { id: 'a', _index: 0 };
+    const ctx = {
+        row_heights: {},
+        tasks: [task],
+        get_task(id) {
+            return this.tasks.find((t) => t.id === id);
+        },
+        render() {
+            rendered = true;
+        },
+    };
+
+    Gantt.prototype.updateRowHeight.call(ctx, 'a', Infinity);
+
+    expect(task.row_height).toBeUndefined();
+    expect(ctx.row_heights.a).toBeUndefined();
+    expect(rendered).toBe(false);
+});

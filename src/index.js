@@ -2106,8 +2106,8 @@ export default class Gantt {
         }
 
         // Validate height
-        if (typeof height !== 'number' || height <= 0) {
-            console.error('Height must be a positive number');
+        if (typeof height !== 'number' || !isFinite(height) || height <= 0) {
+            console.error('Height must be a positive finite number');
             return;
         }
 
