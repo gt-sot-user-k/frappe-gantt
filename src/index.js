@@ -619,8 +619,9 @@ export default class Gantt {
             : this.config.header_height;
 
         // Sum up all row heights
+        const bg_heights = this.getRowHeights();
         for (let i = 0; i < this.tasks.length; i++) {
-            task_based_height += this.getRowHeight(i);
+            task_based_height += bg_heights[this.tasks[i].id];
         }
         task_based_height -= 10;
 
@@ -663,8 +664,9 @@ export default class Gantt {
         const row_width = this.dates.length * this.config.column_width;
 
         let y = this.config.header_height;
-        this.tasks.forEach((task, index) => {
-            const row_height = this.getRowHeight(index);
+        const row_heights = this.getRowHeights();
+        this.tasks.forEach((task) => {
+            const row_height = row_heights[task.id];
             createSVG('rect', {
                 x: 0,
                 y,
@@ -792,8 +794,9 @@ export default class Gantt {
         const row_width = this.dates.length * this.config.column_width;
         if (this.options.lines !== 'vertical') {
             // Draw horizontal lines using custom row heights
-            this.tasks.forEach((task, index) => {
-                const row_height = this.getRowHeight(index);
+            const tick_row_heights = this.getRowHeights();
+            this.tasks.forEach((task) => {
+                const row_height = tick_row_heights[task.id];
                 createSVG('line', {
                     x1: 0,
                     y1: row_y + row_height,
@@ -972,8 +975,9 @@ export default class Gantt {
 
         // Sum per-row heights so highlights honor custom row heights
         let height = 0;
+        const hl_heights = this.getRowHeights();
         for (let i = 0; i < this.tasks.length; i++) {
-            height += this.getRowHeight(i);
+            height += hl_heights[this.tasks[i].id];
         }
         // Only insert the pattern if it doesn't already exist
         if (!this.$svg.querySelector('#diagonalHatch')) {
@@ -2105,18 +2109,6 @@ export default class Gantt {
             heights[task.id] = task.row_height || default_height;
         }
         return heights;
-    }
-
-    /**
-     * Get the height of a specific row
-     * @param {number} taskIndex - Task index
-     * @returns {number} Row height in pixels
-     */
-    getRowHeight(taskIndex) {
-        const task = this.tasks[taskIndex];
-        return task && task.row_height
-            ? task.row_height
-            : this.options.bar_height + this.options.padding;
     }
 
     /**
