@@ -6,6 +6,10 @@ const DEP_HANDLE_SIZE = 35;
 
 const RESIZE_HANDLE_SIZE = 10.5;
 
+// Visual width of the placeholder "nub" rendered for a zero-duration task so it
+// stays visible and grabbable. Purely cosmetic — never used for date math.
+export const ZERO_DURATION_NUB_WIDTH = 28;
+
 /**
  * Represents a task bar in the Gantt chart
  * @class
@@ -84,6 +88,24 @@ export default class Bar {
         if (!this.task.progress || this.task.progress < 0)
             this.task.progress = 0;
         if (this.task.progress > 100) this.task.progress = 100;
+    }
+
+    /**
+     * Decide whether this bar is a zero-duration "ghost" and what width to render.
+     * @param {number} logical_width - column_width * duration (0 for zero-duration)
+     * @returns {{ is_zero_duration: boolean, render_width: number }}
+     */
+    compute_zero_duration_state(logical_width) {
+        const is_zero_duration =
+            logical_width === 0 &&
+            !!this.gantt.options.zero_duration_editable &&
+            !this.invalid;
+        return {
+            is_zero_duration,
+            render_width: is_zero_duration
+                ? ZERO_DURATION_NUB_WIDTH
+                : logical_width,
+        };
     }
 
     prepare_helpers() {
