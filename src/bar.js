@@ -573,8 +573,17 @@ export default class Bar {
             this.x = x;
             this.$date_highlight.style.left = x + 'px';
         }
-        if (width > 0) {
+        if (width === 0 && this.gantt.options.zero_duration_editable) {
+            // Collapsed to zero duration: show the ghost nub, keep end === start.
+            this.is_zero_duration = true;
+            this.update_attr(bar, 'width', ZERO_DURATION_NUB_WIDTH);
+            bar.classList.add('bar-zero-duration');
+            this.$date_highlight.style.width = ZERO_DURATION_NUB_WIDTH + 'px';
+        } else if (width > 0) {
+            // Real duration: solid bar.
+            this.is_zero_duration = false;
             this.update_attr(bar, 'width', width);
+            bar.classList.remove('bar-zero-duration');
             this.$date_highlight.style.width = width + 'px';
         }
 

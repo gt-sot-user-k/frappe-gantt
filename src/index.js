@@ -1530,7 +1530,9 @@ export default class Gantt {
                     const $bar = bar.$bar;
                     $bar.ox = $bar.getX();
                     $bar.oy = $bar.getY();
-                    $bar.owidth = $bar.getWidth();
+                    // A ghost renders a cosmetic nub; resize deltas measure from
+                    // its logical width of 0, not the nub's pixel width.
+                    $bar.owidth = bar.is_zero_duration ? 0 : $bar.getWidth();
                     $bar.finaldx = 0;
                 });
             },
