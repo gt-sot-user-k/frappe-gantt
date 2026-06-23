@@ -84,7 +84,11 @@ export default class Bar {
         this.compute_y();
         this.compute_duration();
         this.corner_radius = this.gantt.options.bar_corner_radius;
-        this.width = this.gantt.config.column_width * this.duration; // Draw more on 10% than date
+        const logical_width = this.gantt.config.column_width * this.duration;
+        const { is_zero_duration, render_width } =
+            this.compute_zero_duration_state(logical_width);
+        this.is_zero_duration = is_zero_duration;
+        this.width = render_width;
         if (!this.task.progress || this.task.progress < 0)
             this.task.progress = 0;
         if (this.task.progress > 100) this.task.progress = 100;
@@ -169,6 +173,9 @@ export default class Bar {
             append_to: this.bar_group,
         });
         if (this.task.color) this.$bar.style.fill = this.task.color;
+        if (this.is_zero_duration) {
+            this.$bar.classList.add('bar-zero-duration');
+        }
         animateSVG(this.$bar, 'width', 0, this.width);
 
         if (this.invalid) {
