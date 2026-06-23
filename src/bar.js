@@ -243,6 +243,10 @@ export default class Bar {
     }
 
     calculate_progress_width() {
+        if (this.is_zero_duration) {
+            this.progress_width = 0;
+            return 0;
+        }
         const width = this.$bar.getWidth();
         const ignored_end = this.x + width;
         const total_ignored_area =
