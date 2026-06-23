@@ -40,4 +40,5 @@ dist/
 .git/
 .github/
 
-docs/
+# Local agent/LLM tooling (superpowers specs & plans live here, not tracked)
+.claude/
