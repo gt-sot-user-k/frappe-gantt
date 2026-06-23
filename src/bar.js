@@ -668,7 +668,10 @@ export default class Bar {
             this.gantt.config.unit,
         );
 
-        const width_in_units = bar.getWidth() / this.gantt.config.column_width;
+        // A zero-duration ghost renders a cosmetic nub; its logical width is 0,
+        // so the end date must equal the start date.
+        const logical_width = this.is_zero_duration ? 0 : bar.getWidth();
+        const width_in_units = logical_width / this.gantt.config.column_width;
         const new_end_date = date_utils.add(
             new_start_date,
             width_in_units * this.gantt.config.step,
