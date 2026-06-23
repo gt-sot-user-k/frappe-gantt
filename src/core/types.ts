@@ -119,6 +119,8 @@ export interface GanttOptions {
   popup?: ((ctx: any) => string | false | void) | false;
   popupOn?: 'click' | 'hover';
   readonly?: boolean | ReadonlyOptions;
+  /** Render zero-duration tasks (start === end) as an editable dashed nub. */
+  zeroDurationEditable?: boolean;
   table?: TableIntegrationOptions;
   // GanttPlugin[] — typed in the plugin stage to avoid a forward dependency here.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
