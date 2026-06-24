@@ -6,6 +6,10 @@ const DEP_HANDLE_SIZE = 35;
 
 const RESIZE_HANDLE_SIZE = 10.5;
 
+// Visual width of the placeholder "nub" rendered for a zero-duration task so it
+// stays visible and grabbable. Purely cosmetic — never used for date math.
+export const ZERO_DURATION_NUB_WIDTH = 28;
+
 /**
  * Represents a task bar in the Gantt chart
  * @class
@@ -80,10 +84,32 @@ export default class Bar {
         this.compute_y();
         this.compute_duration();
         this.corner_radius = this.gantt.options.bar_corner_radius;
-        this.width = this.gantt.config.column_width * this.duration; // Draw more on 10% than date
+        const logical_width = this.gantt.config.column_width * this.duration;
+        const { is_zero_duration, render_width } =
+            this.compute_zero_duration_state(logical_width);
+        this.is_zero_duration = is_zero_duration;
+        this.width = render_width;
         if (!this.task.progress || this.task.progress < 0)
             this.task.progress = 0;
         if (this.task.progress > 100) this.task.progress = 100;
+    }
+
+    /**
+     * Decide whether this bar is a zero-duration "ghost" and what width to render.
+     * @param {number} logical_width - column_width * duration (0 for zero-duration)
+     * @returns {{ is_zero_duration: boolean, render_width: number }}
+     */
+    compute_zero_duration_state(logical_width) {
+        const is_zero_duration =
+            logical_width === 0 &&
+            !!this.gantt.options.zero_duration_editable &&
+            !this.invalid;
+        return {
+            is_zero_duration,
+            render_width: is_zero_duration
+                ? ZERO_DURATION_NUB_WIDTH
+                : logical_width,
+        };
     }
 
     prepare_helpers() {
@@ -147,6 +173,9 @@ export default class Bar {
             append_to: this.bar_group,
         });
         if (this.task.color) this.$bar.style.fill = this.task.color;
+        if (this.is_zero_duration) {
+            this.$bar.classList.add('bar-zero-duration');
+        }
         animateSVG(this.$bar, 'width', 0, this.width);
 
         if (this.invalid) {
@@ -214,6 +243,10 @@ export default class Bar {
     }
 
     calculate_progress_width() {
+        if (this.is_zero_duration) {
+            this.progress_width = 0;
+            return 0;
+        }
         const width = this.$bar.getWidth();
         const ignored_end = this.x + width;
         const total_ignored_area =
@@ -544,8 +577,17 @@ export default class Bar {
             this.x = x;
             this.$date_highlight.style.left = x + 'px';
         }
-        if (width > 0) {
+        if (width === 0 && this.gantt.options.zero_duration_editable) {
+            // Collapsed to zero duration: show the ghost nub, keep end === start.
+            this.is_zero_duration = true;
+            this.update_attr(bar, 'width', ZERO_DURATION_NUB_WIDTH);
+            bar.classList.add('bar-zero-duration');
+            this.$date_highlight.style.width = ZERO_DURATION_NUB_WIDTH + 'px';
+        } else if (width > 0) {
+            // Real duration: solid bar.
+            this.is_zero_duration = false;
             this.update_attr(bar, 'width', width);
+            bar.classList.remove('bar-zero-duration');
             this.$date_highlight.style.width = width + 'px';
         }
 
@@ -646,7 +688,10 @@ export default class Bar {
             this.gantt.config.unit,
         );
 
-        const width_in_units = bar.getWidth() / this.gantt.config.column_width;
+        // A zero-duration ghost renders a cosmetic nub; its logical width is 0,
+        // so the end date must equal the start date.
+        const logical_width = this.is_zero_duration ? 0 : bar.getWidth();
+        const width_in_units = logical_width / this.gantt.config.column_width;
         const new_end_date = date_utils.add(
             new_start_date,
             width_in_units * this.gantt.config.step,

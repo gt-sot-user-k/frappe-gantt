@@ -170,6 +170,7 @@ const DEFAULT_OPTIONS = {
     readonly_progress: false,
     readonly_dates: false,
     readonly: false,
+    zero_duration_editable: true,
     scroll_to: 'today',
     show_expected_progress: false,
     expected_date_line: false,

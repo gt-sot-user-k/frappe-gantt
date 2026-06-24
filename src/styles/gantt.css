@@ -387,6 +387,14 @@
             }
         }
 
+        & .bar-zero-duration {
+            fill: var(--g-bar-color);
+            fill-opacity: 0.35;
+            stroke: var(--g-bar-border);
+            stroke-width: 1.5;
+            stroke-dasharray: 4;
+        }
+
         & .bar-label {
             fill: var(--g-text-dark);
             dominant-baseline: central;

@@ -81,6 +81,7 @@ The Enhanced Gantt Chart offers a wide range of options to customize your chart.
 | `readonly_progress`      | Disables editing task progress.                                                 | `true`, `false`                                    | `false`                            |
 | `readonly_dates`         | Disables editing task dates.                                                    | `true`, `false`                                    | `false`                            |
 | `readonly`               | Disables all editing features.                                                  | `true`, `false`                                    | `false`                            |
+| `zero_duration_editable` | Render zero-duration tasks (`start === end`) as an editable dashed nub that can be extended or moved. | `true`, `false` | `true` |
 | `scroll_to`              | Determines the starting point when chart is rendered.                                           | `today`, `start`, `end`, or a date string.  | `today`                          |
 | `show_expected_progress` | Shows expected progress for tasks.                                              | `true`, `false`                                    | `false`                            |
 | `expected_date_line`     | Shows a vertical line indicating expected completion date.                      | `true`, `false`                                    | `false`                            |
